@@ -1,0 +1,372 @@
+﻿
+@using System.Security.Claims
+@{
+    var user = Context.User;
+    var isAuthenticated = user?.Identity?.IsAuthenticated??false;
+    var username = user?.Identity?.Name??"";
+    var role = user?.FindFirst(ClaimTypes.Role)?.Value??"";
+}
+
+
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OMNI</title>
+    <link rel="icon" type="image/png" href="/assets/Content/img/favicon.png" sizes="16x16">
+
+
+    @* *@ <link rel="stylesheet" href="/assets/Content/bundles/prism/prism.css">
+      <link rel="stylesheet" href="/assets/Content/bundles/bootstrap-daterangepicker/daterangepicker.css">
+    <link rel="stylesheet" href="/assets/Content/bundles/datatables/datatables.min.css">
+    <link rel="stylesheet" href="/assets/Content/bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css"> 
+
+    <!-- Template CSS -->
+   
+   
+    <!-- Custom style CSS -->
+   
+     <link rel="stylesheet" href="/assets/Content/css/app.min.css">
+     <link rel="stylesheet" href="/assets/Content/css/style.css">
+     <link rel="stylesheet" href="/assets/Content/css/components.css">
+     <link rel="stylesheet" href="/assets/Content/css/custom.css">
+
+    <link rel='shortcut icon' type='image/x-icon' href='/assets/Content/img/favicon.ico' />
+
+     
+
+    <style>
+
+
+
+
+        .blinking-image {
+            animation: blink 1s infinite; /* Apply the blinking animation */
+        }
+
+        @@keyframes blink {
+            0%, 100% {
+                opacity: 1;
+            }
+            /* Fully visible at the start and end */
+            50% {
+                opacity: 0;
+            }
+            /* Hidden at the midpoint */
+        }
+    </style>
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
+
+
+
+
+</head>
+<body>
+
+
+    <div class="loader"></div>
+    <div id="app">
+        <div class="main-wrapper main-wrapper-1">
+            <div class="navbar-bg"></div>
+            <nav class="navbar navbar-expand-lg main-navbar">
+                <div class="form-inline mr-auto">
+                    <ul class="navbar-nav mr-3">
+                        <li>
+                           <!--  <a href="#" data-toggle="sidebar" class="nav-link nav-link-lg collapse-btn"><i
+                        class="fas fa-bars"></i></a></li>
+                        <li> -->
+                            <a href="#" class="nav-link nav-link-lg fullscreen-btn">
+                                <i class="fas fa-expand"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <ul class="navbar-nav navbar-right">
+                    <li class="mr-4">
+                        <span class="message-user" id="invhealthCheckSpan">
+                            <text>Inventory Service Health</text>
+                            <img src="/assets/Content/img/success.png" height="18" class="" id="invHealthCheck" />
+                        </span>
+                    </li>
+                    <li class="mr-4">
+                        <span class="message-user" id="orderhealthCheckSpan">
+                            <text>Order Service Health</text>
+                            <img src="/assets/Content/img/success.png" height="18" class="" id="orderHealthCheck" />
+                        </span>
+                    </li>
+                   @*  <li class="mr-4">
+                        <span class="message-user" id="healthCheckSpan">
+                            <text>Agent Service Health</text>
+                            <img src="/assets/Content/img/success.png" height="18" class="" id="agentHealthCheck" />
+                        </span>
+                    </li> *@
+
+                    <li>
+                        <span class="message-user">
+                            @if (@username != "" && isAuthenticated)
+                            {
+                                <text>Welcome @username</text>
+                            }
+                        </span>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
+                            <span class="d-sm-none d-lg-inline-block fas fa-user-alt"></span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right">
+
+                            <a href="/Logout" class="dropdown-item has-icon text-danger">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                            <a href="javascript:void(0);" class="dropdown-item has-icon text-info" onclick="changePassword()">
+                                <i class="fas fa-key "></i> Change Password
+                            </a>
+                        </div>
+                        <script>
+                            function changePassword() {
+                                var dialog = document.getElementById("change").ej2_instances[0];
+                                dialog.show();
+                            }
+
+                        </script>
+                    </li>
+                </ul>
+            </nav>
+            <div class="main-sidebar sidebar-style-4" style="z-index:1039;">
+                <aside id="sidebar-wrapper">
+                    <div class="sidebar-brand">
+                        <a href="/">
+                            <img alt="OMNI" src="/assets/Content/img/logo1h.png" style="  height: 75%;" class="header-logo" />
+                            <span class="logo-name"> <img alt="OMNI" src="/assets/Content/img/logo2h.png" style="height: 75%; margin-left: -8px; margin-top: -5px;" class="header-logo" /></span>
+                        </a>
+                    </div>
+                    <ul class="sidebar-menu">
+                        @if (@role != "" && role == "Super Admin")
+                        {
+
+                            <li class="" id="dashboard_menu"><a id="dashLink" class="nav-link" href="/Index"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+
+                            <li class="" id="configuration_menu"><a id="configLink" class="nav-link" href="/Configurations"><i class="fas fa-cogs"></i><span>Configuration</span></a></li>
+
+                            <li class="" id="security_menu"><a id="securityLink" class="nav-link" href="/Users"><i class="fas fa-user-shield"></i><span>User Management</span></a></li>
+
+                            <li class="" id="inventory_menu"><a id="invLink" class="nav-link" href="/ItemListing"><i class="fas fa-archive"></i><span>Inventory</span></a></li>
+                            <li class="" id="order_nemu"><a id="orderLink" class="nav-link" href="/OrderListing"><i class="fas fa-cart-arrow-down"></i><span>Orders</span></a></li>
+
+                            <li class="dropdown">
+                                <a href="#" class="nav-link has-dropdown"><i class="fas fa-qrcode"></i><span>Reports</span></a>
+                                <ul class="dropdown-menu">
+                                    <li class="" id="order_exception_menu"><a class="order-nav-link" href="/Reports/OrderException">Order Exceptions</a></li>
+                                    <li class="" id="inventory_exception_menu"><a class="inv-nav-link" href="/Reports/InventoryException">INV. Exceptions</a></li>
+                                </ul>
+                            </li>
+
+                        }
+                        @if (@role != "" && role == "Admin")
+                        {
+
+                            <li class="" id="dashboard_menu"><a id="dashLink" class="nav-link" href="/Index"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+
+                            <li class="" id="security_menu"><a id="securityLink" class="nav-link" href="/Users"><i class="fas fa-user-shield"></i><span>User Management</span></a></li>
+
+                            <li class="" id="inventory_menu"><a id="invLink" class="nav-link" href="/ItemListing"><i class="fas fa-archive"></i><span>Inventory</span></a></li>
+                            <li class="" id="order_nemu"><a id="orderLink" class="nav-link" href="/OrderListing"><i class="fas fa-cart-arrow-down"></i><span>Orders</span></a></li>
+
+
+                        }
+                        @if (@role != "" && role == "Staff")
+                        {
+
+                            <li class="" id="dashboard_menu"><a id="dashLink" class="nav-link" href="/Index"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+
+                            <li class="" id="inventory_menu"><a id="invLink" class="nav-link" href="/ItemListing"><i class="fas fa-archive"></i><span>Inventory</span></a></li>
+                            <li class="" id="order_nemu"><a id="orderLink" class="nav-link" href="/OrderListing"><i class="fas fa-cart-arrow-down"></i><span>Orders</span></a></li>
+
+                           @*  <li class="dropdown">
+                                <a href="#" class="nav-link has-dropdown"><i class="fas fa-qrcode"></i><span>Reports</span></a>
+                                <ul class="dropdown-menu">
+                                    <li class="" id="order_exception_menu"><a class="order-nav-link" href="/Reports/OrderException">Order Exceptions</a></li>
+                                    <li class="" id="inventory_exception_menu"><a class="inv-nav-link" href="/Reports/InventoryException">INV. Exceptions</a></li>
+                                </ul>
+                            </li> *@
+
+                        }
+
+                        @*@if (@userData["type"].ToString() == "Service Agent")
+                            {
+                                <li class="" id="dashboard_menu"><a id="dashLink" class="nav-link" href="/Home/Index"><i class="fab fa-home"></i><span>Dashboard</span></a></li>
+                                <li class="" id="configuration_menu"><a id="configLink" class="nav-link" href="/Home/Configurations"><i class="fab fa-cogs"></i><span>Configuration</span></a></li>
+                                <li class="" id="security_menu"><a id="securityLink" class="nav-link" href="/Users"><i class="fab fa-cogs"></i><span>User Management</span></a></li>
+
+                                <li class="" id="inventory_menu"><a id="invLink" class="nav-link" href="/Dashboard/ItemListing"><i class="fab fa-cogs"></i><span>Inventory</span></a></li>
+                                <li class="" id="order_nemu"><a id="orderLink" class="nav-link" href="/Dashboard/OrderListing"><i class="fab fa-cogs"></i><span>Orders</span></a></li>
+                                <li class="dropdown">
+                                    <a href="#" class="nav-link has-dropdown"><i class="fas fa-qrcode"></i><span>Reports</span></a>
+                                    <ul class="dropdown-menu">
+                                        <li class="" id="order_exception_menu"><a class="order-nav-link" href="/Dashboard/OrderException">Order Exceptions</a></li>
+                                        <li class="" id="inventory_exception_menu"><a class="inv-nav-link" href="/Dashboard/InventoryException">INV. Exceptions</a></li>
+                                    </ul>
+                                </li>
+                            }
+
+                            @if (@userData["type"].ToString() == "Client User")
+                            {
+
+                                <li class="" id="dashboard_menu"><a id="dashLink" class="nav-link" href="/Home/Index"><i class="fab fa-home"></i><span>Dashboard</span></a></li>
+                                <li class="" id="inventory_menu"><a id="invLink" class="nav-link" href="/Dashboard/ItemListing"><i class="fab fa-cogs"></i><span>Inventory</span></a></li>
+                                <li class="" id="order_nemu"><a id="orderLink" class="nav-link" href="/Dashboard/OrderListing"><i class="fab fa-cogs"></i><span>Orders</span></a></li>
+                                <li class="dropdown">
+                                    <a href="#" class="nav-link has-dropdown"><i class="fas fa-qrcode"></i><span>Reports</span></a>
+                                    <ul class="dropdown-menu">
+                                        <li class="" id="order_exception_menu"><a class="order-nav-link" href="/Dashboard/OrderException">Order Exceptions</a></li>
+                                        <li class="" id="inventory_exception_menu"><a class="inv-nav-link" href="/Dashboard/InventoryException">INV. Exceptions</a></li>
+                                    </ul>
+                                </li>
+                            }*@
+
+                    </ul>
+                </aside>
+                <aside class="sidebar-footer fixed-bottom pl-3">
+                    <a href="#">
+                        <img alt="image" src="/assets/Content/img/taar.png" style=" margin-bottom: 15px; margin-left:35px" height=36 />
+                    </a>
+                </aside>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                @RenderBody()
+                <footer class="main-footer mt-0" style="z-index:1038; position: fixed; bottom: 0; left: 0; width: 100%;">
+                    <div class="footer-left">
+
+                    </div>
+                    <div class="footer-right">
+                        Copyright &copy; @(DateTime.Today.Year)
+                        <div class="bullet"></div> Powered By <a href="https://www.taar.co.uk/">TAAR</a>
+                    </div>
+                </footer>
+            </div>
+        </div>
+
+    </div>
+
+
+    <script src="/assets/Content/js/app.min.js"></script>
+    <script src="/assets/Content/bundles/bootstrap-daterangepicker/daterangepicker.js"></script>
+    <script src="/assets/Content/bundles/bootstrap-timepicker/js/bootstrap-timepicker.min.js"></script>
+
+
+    <!-- JS Libraies-->
+    @* <script src="/assets/Content/bundles/prism/prism.js"></script> *@
+    <script src="/assets/Content/bundles/datatables/datatables.min.js"></script>
+    <script src="/assets/Content/bundles/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js"></script>
+    <script src="/assets/Content/js/page/datatables.js"></script>
+
+    <script src="/assets/Content/js/scripts.js"></script>
+    <!-- Custom JS File -->
+    <script src="/assets/Content/js/custom.js"></script>
+
+    @RenderSection("Scripts", false)
+
+    <script>
+
+        function getAgentHealth() {
+
+
+            $.ajax({
+                url: '/Dashboard/AgentHealth',  // URL to the controller action
+                type: 'GET',
+                success: function (response) {
+                    var imageElement = document.getElementById("agentHealthCheck");
+
+                    if (response) {
+
+                        imageElement.src = "/assets/Content/img/success.png"
+                        $('#healthCheckSpan').removeClass("blinking-image");
+                        // document.getElementById("healthCheckSpan").removeClass("blinking-image");
+
+                    } else {
+                        imageElement.src = "/assets/Content/img/error.png"
+                        $('#healthCheckSpan').addClass("blinking-image");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    alert("YOU are currently offline ! \nCheck Internet Connection ");
+                }
+            });
+
+        }
+
+                function serviceStateCheck() {
+            $.ajax({
+                url: '@Url.Action("ServiceStatus", "Home")',
+                type: 'GET',
+                dataType: 'json',
+                success: function (response) {
+                    var data = JSON.parse(response)
+
+                    var orderElement = document.getElementById("orderHealthCheck");
+                    var invElement = document.getElementById("invHealthCheck");
+
+                    const invDiff = moment().diff(moment(data["InvnSrvLastRunAt"]), 'minutes');
+                    const orderDiff = moment().diff(moment(data["OrderSrvLastRunAt"]), 'minutes');
+
+                    if (invDiff > 15) {
+                        invElement.src = "/assets/Content/img/error.png"
+                        $('#invhealthCheckSpan').addClass("blinking-image");
+
+                    }
+                    else {
+                        invElement.src = "/assets/Content/img/success.png"
+                        $('#invhealthCheckSpan').removeClass("blinking-image");
+                    }
+
+                    if (orderDiff > 15) {
+                        orderElement.src = "/assets/Content/img/error.png"
+                        $('#orderhealthCheckSpan').addClass("blinking-image");
+
+                    }
+                    else {
+                        orderElement.src = "/assets/Content/img/success.png"
+                        $('#orderhealthCheckSpan').removeClass("blinking-image");
+                    }
+
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error fetching data:', error);
+                }
+            });
+        }
+
+
+        // $(document).ready(function () {
+        //     getAgentHealth();
+        //     serviceStateCheck();
+        //     setInterval(getAgentHealth, 15000);
+        //     setInterval(serviceStateCheck, 15000);
+        // });
+    </script>
+
+  <!-- Page Specific JS File -->
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.34/moment-timezone-with-data.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+

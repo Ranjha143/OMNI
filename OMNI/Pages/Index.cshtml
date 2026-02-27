@@ -1,0 +1,877 @@
+﻿@page
+
+@using OMNI.Pages
+@model IndexModel
+@using System.Security.Claims
+@{
+
+    var user = HttpContext.User;
+    var isAuthenticated = user?.Identity?.IsAuthenticated ?? false;
+    var username = user?.Identity?.Name ?? "";
+    var role = user?.FindFirst(ClaimTypes.Role)?.Value ?? "";
+    var Id = user?.FindFirst(ClaimTypes.Sid)?.Value ?? "";
+
+    ViewData["Title"] = "Dashboard";
+}
+
+
+
+
+<style>
+    div.dataTables_wrapper div.dataTables_length select {
+        width: 90px !important;
+        display: inline-block;
+    }
+
+    table.dataTable tbody td img {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: auto !important;
+        height: 22px !important;
+    }
+</style>
+
+<section class="section">
+    <div class="section-header">
+        <h1>Dashboard</h1>
+        <div class="section-header-dates">
+
+            <div class="mr-1 p-2" style="border-bottom-width:3px !important;" id="todayBtn"><a role="button" class=" date-btn text-dark font-bold" onclick="clickToday()">Today</a></div>
+            <div class="mr-1 p-2" style="border-bottom-width:3px !important;" id="yesterdayBtn"><a role="button" class=" date-btn text-dark font-bold" onclick="clickYesterday()">Yesterday</a></div>
+            <div class="mr-1 p-2" style="border-bottom-width:3px !important;" id="days7Btn"><a role="button" class=" date-btn text-dark font-bold" onclick="clickLast7()">Last 7 Days</a></div>
+            <div class="mr-1 p-2" style="border-bottom-width:3px !important;" id="days15Btn"><a role="button" class=" date-btn text-dark font-bold" onclick="clickLast15()">Last 15 Days</a></div>
+            <div class="mr-1 p-2" style="border-bottom-width:3px !important;" id="dtRangePiker">
+                <div class="row">
+                    <div class="col-6">
+                        <input type="date" id="fromDate" asp-for="FromDate" class="form-control" max="@DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd")" value="@DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd")" onchange="handleStartDateChange(this)" style="width:145px" />
+                        <script>
+
+                            function handleStartDateChange(input){
+                                $("#toDate").val(input.value);
+                                $("#toDate").attr("min", input.value);
+                            }
+                        </script>
+                        </div>
+                    <div class="col-6s">
+                        <input type="date" id="toDate" asp-for="ToDate" class="form-control disabled" max="@DateTime.Now.ToString("yyyy-MM-dd")" value="@DateTime.Now.ToString("yyyy-MM-dd")" onchange="handleEndDateChange(this)" style="width:145px" />
+                    </div>
+                    <script>
+                        function handleEndDateChange(input)
+                           {
+                             dateRangeChange($("#fromDate").val(), input.value)
+                           }
+                    </script>
+                </div>
+            </div>
+            <script>
+
+            </script>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-4 col-md-6 col-sm-6 col-12">
+            <div class="card card-statistic-1">
+                <i class="material-icons card-icon col-red">extension</i>
+                <div class="card-wrap">
+                    <div class="padding-20">
+                        <div class="text-right">
+                            <h4 class="font-light mb-0">
+                                <i class="ti-arrow-up text-success"></i><span id="invService" class="text-danger">Disabled</span>
+                            </h4>
+                            <h6 class="text-muted">Inventory Service</h6>
+                        </div>
+                        <div>
+                            <span id="invSrvLastRun" name="invSrvLastRun" class="text-nowrap text-dark">Last Run </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 col-sm-6 col-12">
+            <div class="card card-statistic-1">
+                <i class="fas fa-shopping-bag card-icon col-green"></i>
+                <div class="card-wrap">
+                    <div class="padding-20">
+                        <div class="text-right">
+                            <h4 class="font-light mb-0">
+                                <i class="ti-arrow-up text-success"></i> <span id="shopifyInvStyle"></span>
+                            </h4>
+                            <h6 class="text-muted">Shopify Inventory</h6>
+                        </div>
+                        <div>
+                            <span class="text-nowrap" id="shopifyInv">Total Variant : </span>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 col-sm-6 col-12">
+            <div class="card card-statistic-1">
+                <i class="fas fa-boxes card-icon col-blue"></i>
+                <div class="card-wrap">
+                    <div class="padding-20">
+                        <div class="text-right">
+                            <h4 class="font-light mb-0">
+                                <i class="ti-arrow-up text-success"></i> <span id="rpInvStyle"></span>
+                            </h4>
+                            <h6 class="text-muted">RetailPro Inventory</h6>
+                        </div>
+                        <div class="mb-3 text-muted pull-left text-sm">
+                            <span class="text-nowrap" id="rpInv">Total Variant : </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        @*<div class="col-lg-3 col-md-6 col-sm-6 col-12">
+                <div class="card card-statistic-1">
+                    <i class="fas fa-exclamation-triangle card-icon col-red"></i>
+                    <div class="card-wrap">
+                        <div class="padding-20">
+                            <div class="text-right">
+                                <h4 class="font-light mb-0">
+                                    <i class="ti-arrow-up text-success"></i> <span>2 Exceptions</span>
+                                </h4>
+                                <h6 class="text-muted">Inventory Exceptions</h6>
+                            </div>
+                            <p class="mb-3 text-muted pull-left text-sm">
+                                <span class="text-danger">Create Error: 99+</span>
+                                <span class="text-dark bold mr-1 ml-1">|</span>
+                                <span class="text-danger">Sync Errors: 99+</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        <div class="col-lg-4 col-md-6 col-sm-6 col-12">
+            <div class="card card-statistic-1">
+                <!-- <i class="fas fa-cogs card-icon col-red"></i> -->
+                <i class="material-icons card-icon col-red">settings</i>
+                <div class="card-wrap">
+                    <div class="padding-20">
+                        <div class="text-right">
+                            <h4 class="font-light mb-0">
+                                <i class="ti-arrow-up text-success"></i><span id="orderService" class="text-danger">Disabled</span>
+                            </h4>
+                            <h6 class="text-muted">Order Service</h6>
+                        </div>
+                        <div>
+                            <span class="text-nowrap" id="orderSrvLastRun">Last Run </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 col-sm-6 col-12">
+            <div class="card card-statistic-1">
+                <i class="fas fa-cart-arrow-down card-icon col-orange"></i>
+                <div class="card-wrap">
+                    <div class="padding-20">
+                        <div class="text-right">
+                            <h4 class="font-light mb-0">
+                                <i class="ti-arrow-up text-success"></i> <span id="availableOrders">0 Orders</span>
+                            </h4>
+                            <h6 class="text-muted">Shopify Orders</h6>
+                        </div>
+                        <div>
+                            <span class="text-nowrap" id="availableOrderDetail"> &nbsp;</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-6 col-12">
+            <div class="card card-statistic-1">
+                <i class="fas fa-chart-line card-icon col-orange"></i>
+                <div class="card-wrap">
+                    <div class="padding-20">
+                        <div class="text-right">
+                            <h4 class="font-light mb-0">
+                                <i class="ti-arrow-up text-success"></i> <span id="retailproInvoicesgenerated">0 Posted</span>
+                            </h4>
+                            <h6 class="text-muted">RetailPro Invoices</h6>
+                        </div>
+                        <div>
+                            <span class="text-nowrap" id="retailproInvoicesDetail"> &nbsp;</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+*@
+        @*<div class="col-lg-3 col-md-6 col-sm-6 col-12">
+                <div class="card card-statistic-1">
+                    <i class="fas fa-exclamation-triangle card-icon col-red"></i>
+                    <div class="card-wrap">
+                        <div class="padding-20">
+                            <div class="text-right">
+                                <h4 class="font-light mb-0">
+                                    <i class="ti-arrow-up text-success"></i> <span>2 Exceptions</span>
+                                </h4>
+                                <h6 class="text-muted">Order Exceptions</h6>
+                            </div>
+                            <p class="mb-3 text-muted pull-left text-sm">
+                                <span class="text-danger">Create Error: 99+</span>
+                                <span class="text-dark bold mr-1 ml-1">|</span>
+                                <span class="text-danger">Sync Errors: 99+</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>*@
+    </div>
+    <div class="row">
+        @* @if (role == "Admin" || role == "Super Admin")
+        {  } *@
+        <div class="col-lg-4 col-md-6 col-sm-6 col-12">
+            <div class="card card-statistic-1">
+                <i class="fas fa-cart-arrow-down card-icon col-orange"></i>
+                <div class="card-wrap">
+                    <div class="padding-20">
+                        <div class="text-right">
+                            <h4 class="font-light mb-0">
+                                <i class="ti-arrow-up text-success"></i> <span id="allOrders">&nbsp;</span>
+                            </h4>
+                            <h5 class="text-muted" id="">All Orders</h5>
+                        </div>
+                        <div>
+                            <span class="text-nowrap" > </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+      
+        <div class="col-lg-4 col-md-6 col-sm-6 col-12">
+            <div class="card card-statistic-1">
+                <i class="fas fa-cart-arrow-down card-icon col-orange"></i>
+                <div class="card-wrap">
+                    <div class="padding-20">
+                        <div class="text-right">
+                            <h4 class="font-light mb-0">
+                                <i class="ti-arrow-up text-success"></i> <span id="assignedOrders">&nbsp;</span>
+                            </h4>
+                            <h5 class="text-muted" id="">Assigned Orders</h5>
+                        </div>
+                        <div>
+                            <span class="text-nowrap"> </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-6 col-12">
+            <div class="card card-statistic-1">
+                <i class="fas fa-cart-arrow-down card-icon col-orange"></i>
+                <div class="card-wrap">
+                    <div class="padding-20">
+                        <div class="text-right">
+                            <h4 class="font-light mb-0">
+                                <i class="ti-arrow-up text-success"></i> <span id="acceptedOrders">&nbsp;</span>
+                            </h4>
+                            <h5 class="text-muted" id="">Accepted Orders</h5>
+                        </div>
+                        <div>
+                            <span class="text-nowrap"> </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-6 col-12">
+            <div class="card card-statistic-1">
+                <i class="fas fa-cart-arrow-down card-icon col-orange"></i>
+                <div class="card-wrap">
+                    <div class="padding-20">
+                        <div class="text-right">
+                            <h4 class="font-light mb-0">
+                                <i class="ti-arrow-up text-success"></i> <span id="dispatchedOrders">&nbsp;</span>
+                            </h4>
+                            <h5 class="text-muted" id="">Dispatched Orders</h5>
+                        </div>
+                        <div>
+                            <span class="text-nowrap"> </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-6 col-12">
+            <div class="card card-statistic-1">
+                <i class="fas fa-cart-arrow-down card-icon col-orange"></i>
+                <div class="card-wrap">
+                    <div class="padding-20">
+                        <div class="text-right">
+                            <h4 class="font-light mb-0">
+                                <i class="ti-arrow-up text-success"></i> <span id="postedOrders">&nbsp;</span>
+                            </h4>
+                            <h5 class="text-muted" id="">Posted Orders</h5>
+                        </div>
+                        <div>
+                            <span class="text-nowrap"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-sm-6 col-12">
+            <div class="card card-statistic-1">
+                <i class="fas fa-cart-arrow-down card-icon col-orange"></i>
+                <div class="card-wrap">
+                    <div class="padding-20">
+                        <div class="text-right">
+                            <h4 class="font-light mb-0">
+                                <i class="ti-arrow-up text-success"></i> <span id="cancelledOrders">&nbsp;</span>
+                            </h4>
+                            <h5 class="text-muted" id="">Cancelled Orders</h5>
+                        </div>
+                        <div>
+                            <span class="text-nowrap"> </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    @*
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header pt-3">
+                        <h3>Order Exception Log</h3>
+                    </div>
+                    <div class="card-body pt-1">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover" id="orderExceptionLog" style="width:100%; font-size:14px!important">
+                                <thead>
+                                    <tr>
+                                        <th>Log Created At</th>
+                                        <th>Service</th>
+                                        <th>Order Number</th>
+                                        <th>Error Source</th>
+                                        <th>Error Message</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header pt-3">
+                        <h3>Inventory Exception Log</h3>
+                    </div>
+                    <div class="card-body pt-1">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover" id="inventoryExceptionLog" style="width:100%; font-size:14px!important">
+                                <thead>
+                                    <tr>
+                                        <th>Log Created At</th>
+                                        <th>Service</th>
+                                        <th>SKU / ALU</th>
+                                        <th>Shopify Product / Variant Id</th>
+                                        <th>Error Source</th>
+                                        <th>Error Message</th>
+                                     
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+    </table>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+
+    *@
+
+</section>
+
+
+<input type="hidden" id="startDate" />
+<input type="hidden" id="endDate" />
+
+@section scripts {
+
+    <script>
+
+            $(document).ready(function () {
+
+                // setTimeout(function(){
+                //     var fDate = new Date()
+                //     var tDate = fDate.getDate() - 5;
+
+                //     $("#toDate").val(fDate);
+                //     $("#fromDate").val(tDate);
+                // });
+
+            });
+
+
+        function setCookie(name, value, days) {
+            var expires = "";
+            if (days) {
+                var date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                expires = "; expires=" + date.toUTCString();
+            }
+            document.cookie = name + "=" + (value || "") + expires + "; path=/";
+        }
+
+        function getCookie(name) {
+            var nameEQ = name + "=";
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var c = cookies[i];
+                while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+            }
+            return null;
+        }
+
+        function clearLog(arg) {
+
+            alert(arg)
+        }
+
+        var fromDate = new Date().toISOString().slice(0, 19).split('T')[0] + "T00:00:00";
+        var toDate = new Date().toISOString().slice(0, 19).split('T')[0] + "T23:59:59";
+
+
+        function clickToday() {
+
+            fromDate = new Date().toISOString().slice(0, 19).split('T')[0] + "T00:00:00";
+            toDate = new Date().toISOString().slice(0, 19).split('T')[0] + "T23:59:59";
+
+            $('#todayBtn').addClass('border-bottom border-info');
+            $('#yesterdayBtn').removeClass('border-bottom border-info');
+            $('#days7Btn').removeClass('border-bottom border-info');
+            $('#days15Btn').removeClass('border-bottom border-info');
+            $('#dtRangePiker').removeClass('border-bottom border-info');
+
+            $('.loader').show();
+
+            fetchInventoryStats();
+            fetchOrderStats();
+                   fetchOrderCounts();
+            // //orderExceptionLogTable.ajax.reload();
+            //inventoryExceptionLogTable.ajax.reload();
+
+            setCookie("reportDays", "today", 30);
+        }
+
+        function clickYesterday() {
+
+            var yesterday = new Date();
+            yesterday.setDate(new Date().getDate() - 1);
+            fromDate = yesterday.toISOString().slice(0, 19).split('T')[0] + "T00:00:00";
+            toDate = yesterday.toISOString().slice(0, 19).split('T')[0] + "T23:59:59";
+
+            $('#todayBtn').removeClass('border-bottom border-info');
+            $('#yesterdayBtn').addClass('border-bottom border-info');
+            $('#days7Btn').removeClass('border-bottom border-info');
+            $('#days15Btn').removeClass('border-bottom border-info');
+            $('#dtRangePiker').removeClass('border-bottom border-info');
+
+            $('.loader').show();
+
+           fetchInventoryStats();
+            fetchOrderStats();
+                   fetchOrderCounts();
+            //orderExceptionLogTable.ajax.reload();
+            //inventoryExceptionLogTable.ajax.reload();
+            setCookie("reportDays", "yesterday", 30);
+        }
+
+        function clickLast7() {
+
+            var previousDay = new Date();
+            previousDay.setDate(new Date().getDate() - 7);
+            fromDate = previousDay.toISOString().slice(0, 19).split('T')[0] + "T00:00:00";
+            toDate = new Date().toISOString().slice(0, 19).split('T')[0] + "T23:59:59";
+
+            $('#todayBtn').removeClass('border-bottom border-info');
+            $('#yesterdayBtn').removeClass('border-bottom border-info');
+            $('#days7Btn').addClass('border-bottom border-info');
+            $('#days15Btn').removeClass('border-bottom border-info');
+            $('#dtRangePiker').removeClass('border-bottom border-info');
+
+            $('.loader').show();
+
+            fetchInventoryStats();
+            fetchOrderStats();
+                   fetchOrderCounts();
+            //orderExceptionLogTable.ajax.reload();
+            //inventoryExceptionLogTable.ajax.reload();
+
+            setCookie("reportDays", "7days", 30);
+
+        }
+
+        function clickLast15() {
+
+            var previousDay = new Date();
+            previousDay.setDate(new Date().getDate() - 15);
+            fromDate = previousDay.toISOString().slice(0, 19).split('T')[0] + "T00:00:00";
+            toDate = new Date().toISOString().slice(0, 19).split('T')[0] + "T23:59:59";
+
+            $('#todayBtn').removeClass('border-bottom border-info');
+            $('#yesterdayBtn').removeClass('border-bottom border-info');
+            $('#days7Btn').removeClass('border-bottom border-info');
+            $('#days15Btn').addClass('border-bottom border-info');
+            $('#dtRangePiker').removeClass('border-bottom border-info');
+
+            $('.loader').show();
+
+             fetchInventoryStats();
+            fetchOrderStats();
+                   fetchOrderCounts();
+            //orderExceptionLogTable.ajax.reload();
+            //inventoryExceptionLogTable.ajax.reload();
+
+            setCookie("reportDays", "15days", 30);
+        }
+
+       
+        function fetchServiceState() {
+            $.ajax({
+                url: 'api/v1/service_status',
+                type: 'GET',
+                dataType: 'json',
+                       success: function (response) {
+
+                    data = response.serviceStatusInfo;
+
+                    if (data.inventoryService) {
+
+                        $('#invService').text(
+                            `Enabled`
+                        );
+
+                        $("#invService").addClass('text-success').removeClass('text-danger');
+
+                    }
+                    else {
+                        $('#invService').html(
+                            `Disabled`
+                        );
+                        $("#invService").addClass('text-danger').removeClass('text-success');
+                    }
+
+                           if (data.orderService) {
+
+                        $('#orderService').text(
+                            `Enabled`
+                        );
+
+                        $("#orderService").addClass('text-success').removeClass('text-danger');
+                    }
+                    else {
+                        $('#orderService').html(
+                            `Disabled`
+                        );
+                        $("#orderService").addClass('text-danger').removeClass('text-success');
+                    }
+
+                    $('#invSrvLastRun').html(
+                               `Last Run ${moment.tz(data.invnSrvLastRunAt, "America/New_York").tz("Europe/Zurich").format('DD-MMM-YYYY HH:mm:ss')}` // | Took ${data["InvTimeElapsed"]}
+                    );
+
+                    $('#orderSrvLastRun').html(
+                                      `Last Run ${moment.tz(data.orderSrvLastRunAt, "America/New_York").tz("Europe/Zurich").format('DD-MMM-YYYY HH:mm:ss')}` // | Took ${data["InvTimeElapsed"]}
+                    );
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error fetching data:', error);
+                }
+            });
+        }
+
+        function fetchOrderCounts(){
+                    $.ajax({
+                              url: `api/v1/order_counts`,
+                       type: 'GET',
+                       dataType: 'json',
+                       data: {
+                           fromDate: fromDate,  // Replace with your actual variable or value
+                           toDate: toDate,        // Replace with your actual variable or value
+                           userId:'@Id'
+                       },
+                       success: function (response) {
+
+                           var data = response;
+
+                           console.log(data)
+                           $('#allOrders').html(data.allOrders)
+                           $('#assignedOrders').html(data.assignedOrders)
+                           $('#acceptedOrders').html(data.acceptedOrders)
+                           $('#dispatchedOrders').html(data.dispatchedOrders)
+                           $('#postedOrders').html(data.postedOrders)
+                                         $('#cancelledOrders').html(data.cancelledOrders)
+                                  // allOrders
+
+                           
+                       },
+                       error: function (xhr, status, error) {
+                           console.error('Error fetching data:', error);
+                       }
+                   });
+        }
+
+
+        function fetchInventoryStats() {
+            $.ajax({
+                url: `api/v1/inventory_state`,
+                type: 'GET',
+                dataType: 'json',
+                data: {
+                   //  fromDate: fromDate,  // Replace with your actual variable or value
+                   //  toDate: toDate        // Replace with your actual variable or value
+                },
+                success: function (response) {
+                    
+                    var data = response.inventoryState;
+
+                    // $('#rpInvStyle').html(
+                    //                    `${data.retailProStyles} Styles`
+                    // );
+
+                    // $('#rpInv').html(
+                    //            `Total Products : ${data.retailProItems}`
+                    // );
+
+                    // $('#shopifyInvStyle').html(
+                    //                   `${data.shopifyVariants} Variants`
+                    // );
+
+                    // $('#shopifyInv').html(
+                    //                   `Total Products : ${data.shopifyProducts}`
+
+                    // );
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error fetching data:', error);
+                }
+            });
+        }
+
+        function fetchOrderStats() {
+            $.ajax({
+                url: `api/v1/order_state?fromDate=${fromDate}&toDate=${toDate}&userId=${'@Id'}`,
+                type: 'GET',
+                dataType: 'json',
+                data: {
+                  //  fromDate: fromDate,  // Replace with your actual variable or value
+                  //  toDate: toDate        // Replace with your actual variable or value
+                },
+                success: function (response) {
+                           var data = response.orderStatusInfo
+
+
+                    $('#availableOrders').html(
+                                      `${data.shopifyDownloadedOrders} Orders`
+                    );
+                    //$('#availableOrderDetail').html(
+                    //    `${data["ShopifyDownloadedOrders"]} Orders Downloaded`
+                    //);
+
+
+                    $('#retailproInvoicesgenerated').html(
+                               `${data.retailProInvoicesProcessed} Posted`
+                    );
+                    //$('#retailproInvoicesDetail').html(
+                    //    `${data["RetailProInvoicesFound"]} Invoices Synced | ${data["OrdersInErrorState"]} have error`
+                    //);
+                    $(".loader").fadeOut("slow");
+                },
+                error: function (xhr, status, error) {
+                    $(".loader").fadeOut("slow");
+                    console.error('Error fetching data:', error);
+                }
+            });
+        }
+
+        /*
+
+        var orderExceptionLogTable;
+        var inventoryExceptionLogTable;
+ */
+        $(document).ready(function () {
+
+            fromDate = new Date().toISOString().slice(0, 19).split('T')[0] + "T00:00:00";
+            toDate = new Date().toISOString().slice(0, 19).split('T')[0] + "T23:59:59";
+            $("#startDate").val(fromDate)
+            $("#endDate").val(toDate)
+
+            fetchServiceState();
+
+            setInterval(fetchServiceState, 30000); // 5 minutes
+            setInterval(fetchInventoryStats, 30000); // 5 minutes
+            setInterval(fetchOrderStats, 30000); // 5 minutes
+            setInterval(fetchOrderCounts, 30000); // 5 minutes
+
+            $("#dashboard_menu").addClass("active");
+            $("#dashLink").addClass("disabled");
+
+            /*
+            orderExceptionLogTable = $('#orderExceptionLog').DataTable({
+                scrollX: true,
+                // stateSave: true,
+                ajax: {
+                    url: '/Home/OrderExceptionLog',
+                    type: 'GET',
+                    dataType: 'json',
+                    data: function (d) {
+                        d.fromDate = fromDate;
+                        d.toDate = toDate;
+                    },
+                    dataSrc: function (result) {
+                        return JSON.parse(result).data;
+                    }
+                },
+                columns: [
+                    {
+                        "data": "created_at",
+                        "render": function (data, type, row) {
+                            return moment.tz(data, "America/New_York").tz("Europe/Zurich").format('DD-MMM-YYYY HH:mm:ss');// moment(data).format('DD/MM/YYYY HH:mm'); moment(data).format('DD/MM/YYYY HH:mm:ss');
+                        },
+                        "width": "200px"
+
+                    },
+                    { "data": "service", "width": "250px"},
+                    { "data": "order_number", "width": "250px"},
+                    { "data": "exception_source", "width": "300px" },
+                    { "data": "exception_message", "width": "400px" },
+                    //{
+                    //    "data": null,
+                    //    "render": function (data, type, row) {
+                    //        return '<button class="btn btn-warning action-btn" data-id="' + row._id + '">Clear</button>';
+                    //    }, "width": "60px"
+                    //}
+                ],
+                // order: [[0, "desc"]],
+                deferRender: true,
+                "order": [[2, "desc"]]
+            });
+
+            inventoryExceptionLogTable = $('#inventoryExceptionLog').DataTable({
+                scrollX: true,
+                // stateSave: true,
+                ajax: {
+                    url: '/Home/InventoryExceptionLog',
+                    type: 'GET',
+                    dataType: 'json',
+                    data: function (d) {
+                        d.fromDate = fromDate;
+                        d.toDate = toDate;
+                    },
+                    dataSrc: function (result) {
+                        return JSON.parse(result).data;
+                    }
+                },
+                columns: [
+                    {
+                        "data": "created_at",
+                        "render": function (data, type, row) {
+                            return moment.tz(data, "America/New_York").tz("Europe/Zurich").format('DD-MMM-YYYY HH:mm:ss');// moment(data).format('DD/MM/YYYY HH:mm'); moment(data).format('DD/MM/YYYY HH:mm:ss');
+                        },
+                        "width": "200px",
+                        orderable:true
+                    },
+                    { "data": "service", "width": "250px" },
+                    { "data": "sku_alu", "width": "250px" },
+                    { "data": "", "width": "250px",
+                        "render": function (data, type, row) {
+                            return row["Shopify Product Id"] +" / "+ row["Shopify Variant Id"];
+                        },
+                     },
+                    { "data": "exception_source", "width": "300px" },
+                    { "data": "exception_message", "width": "400px" },
+                    //{
+                    //    "data": null,
+                    //    "render": function (data, type, row) {
+                    //        return '<button class="btn btn-warning action-btn" data-id="' + row._id + '">Clear</button>';
+                    //    }, "width": "60px"
+                    //}
+                ],
+                // rowGroup: {
+                //     dataSrc: "exception_message" // Group by column1
+                // },
+                deferRender: true,
+                "order": [[0, "desc"]]
+            });
+
+            */
+            clickLast7();
+
+            $('#orderExceptionLog tbody').on('click', '.action-btn', function () {
+                var rowId = $(this).data('id');
+            });
+
+            $('#inventoryExceptionLog tbody').on('click', '.action-btn', function () {
+                var rowId = $(this).data('id');
+            });
+
+
+            var cookieValue = getCookie("reportDays");
+            if (cookieValue == 'today') {
+            }
+            else if (cookieValue == 'today') {
+                clickToday();
+            } else if (cookieValue == 'yesterday') {
+                clickYesterday();
+            } else if (cookieValue == '7days') {
+                clickLast7();
+            } else if (cookieValue == '15days') {
+                clickLast15();
+            }
+
+            
+            fetchOrderCounts();
+        });
+
+            function dateRangeChange(_fromDate, _toDate) {
+
+            $('.loader').show();
+
+            $('#todayBtn').removeClass('border-bottom border-info');
+            $('#yesterdayBtn').removeClass('border-bottom border-info');
+            $('#days7Btn').removeClass('border-bottom border-info');
+            $('#days15Btn').removeClass('border-bottom border-info');
+            $('#dtRangePiker').addClass('border-bottom border-info');
+
+
+            fromDate =_fromDate  + "T00:00:00";//args.value[0].toISOString().slice(0, 19).split('T')[0] + "T00:00:00";
+            toDate = _toDate + "T23:59:59"; // args.value[1].toISOString().slice(0, 19).split('T')[0] + "T23:59:59";
+
+            fetchInventoryStats();
+            fetchOrderStats();
+                    fetchOrderCounts();
+            // orderExceptionLogTable.ajax.reload();
+            // inventoryExceptionLogTable.ajax.reload();
+        }
+
+    </script>
+
+}
+

@@ -1,0 +1,131 @@
+﻿@page
+@model OMNI.Pages.ConfigurationsModel
+@{
+}
+
+
+
+<section class="section" style=" min-height:calc(100vh - 140px) !important;">
+    <div class="section-header">
+        <h1>System Configuration</h1>
+    </div>
+    <div class="row clearfix justify-content-center">
+        <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST">
+                        <h3>Retail Pro Configuration</h3>
+                        <fieldset>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="form-group form-float">
+                                        <div class="form-line">
+                                            <label class="form-label">Client Name*</label>
+                                            <input asp-for="Model.ClientName" class="form-control" required />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-group form-float">
+                                        <div class="form-line">
+                                            <label class="form-label">RetailPro Version*</label>
+                                            <input asp-for="Model.retailpro.platform" class="form-control" required />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="form-group form-float">
+                                        <div class="form-line">
+                                            <label class="form-label">Server Address (IP)*</label>
+                                            <input asp-for="Model.server_address" class="form-control" required />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <hr  class="mt-2 mb-4"/>
+                        <h3>Shopify Configuration</h3>
+                        <fieldset>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="form-group form-float">
+                                        <div class="form-line">
+                                            <label class="form-label">Store Name*</label>
+                                            <input asp-for="Model.store_identifier" class="form-control" required />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-group form-float">
+                                        <div class="form-line">
+                                            <label class="form-label">Location Name*</label>
+                                            <input asp-for="Model.shopify_location_name" class="form-control" required />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="form-group form-float">
+                                        <div class="form-line">
+                                            <label class="form-label">API Key*</label>
+                                            <input asp-for="Model.api_key" class="form-control" required />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-group form-float">
+                                        <div class="form-line">
+                                            <label class="form-label">API Access Token*</label>
+                                            <input asp-for="Model.api_access_token" class="form-control" required />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <hr class="mt-2 mb-4" />
+                        <h3>Services</h3>
+                        <fieldset>
+                            <div class="row mt-3">
+                                <div class="col-6">
+                                    <label>
+                                        <input asp-for="Model.inventory_service" class="mr-2" type="checkbox" style="width:16px; height:16px; accent-color: #007bff;" />
+                                    Enable Inventory Service
+                                </label>
+                                </div>
+                                <div class="col-6">
+                                    <div class="col-6">
+                                        <label>
+                                            <input asp-for="Model.order_service" class="mr-2" type="checkbox" style="width:16px; height:16px; accent-color: #007bff;" />
+                                            Enable Order Service
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </fieldset>
+                        <div class="card-footer">
+                            <div class="row">
+                                <div class="col-8"></div>
+                            <div class="col-2">
+                                    <button class="btn btn-primary" style="width:100px;" >Save</button>
+                            </div>
+                                <div class="col-2">
+                                    <button class="btn btn-dark" style="width:100px;">Close</button>
+                                </div>
+                        </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+
+@section Scripts {
+
+}

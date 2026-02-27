@@ -1,0 +1,209 @@
+﻿@page
+@model OMNI.Pages.Dashboard.ItemListingModel
+@{
+    ViewBag.Title = "Inventory Listing";
+}
+
+<style>
+    /* th {
+            text-align: center !important;
+        } */
+
+    /* table.dataTable tbody td img {
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            width: auto !important;
+            height: auto !important;
+        } */
+
+    div.dataTables_wrapper div.dataTables_length select {
+        width: 90px !important;
+        display: inline-block;
+    }
+
+    table.dataTable tbody td img {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: auto !important;
+        height: 22px !important;
+    }
+</style>
+
+<section class="section">
+    <div class="section-header">
+        <h1>Inventory Listing</h1>
+        <div class="section-header-dates">
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12 mb-5">
+            <div class="card">
+                <!-- <div class="card-header pt-3">
+                    <h4>Item Listing</h4>
+                </div> -->
+                <div class="card-body pt-3" style="min-height:calc(70vh - 20px)">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover" id="inventoryItems" style="width:100%; font-size:14px!important">
+                            <thead>
+                                <tr>
+                                    <th style="text-align: center !important">ALU</th>
+                                    <th style="text-align: left !important">Description</th>
+                                    <th style="text-align: left !important">Color</th>
+                                    @* <th style="text-align: left !important">Size</th> *@
+                                    <th style="text-align: left !important">On Hand</th>
+                                    <th style="text-align: left !important">Committed</th>
+                                    <th style="text-align: left !important">Available</th>
+                                    <th style="text-align: right !important">Sale Price</th>
+                                    <th style="text-align: right !important">Compare At Price</th>
+                                    <th style="text-align: right !important">Store Quantities</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section scripts {
+
+    <script>
+
+        var inventoryItemsGrid;
+
+        $(document).ready(function () {
+
+            $("#inventory_menu").addClass("active");
+            $("#invLink").addClass("disabled");
+
+            inventoryItemsGrid = $('#inventoryItems').DataTable({
+                scrollX: true,
+                stateSave: false,
+                pageLength: 10,
+                lengthMenu: [ [10, 25, 50, 100], [10, 25, 50, 100] ],
+                ajax: {
+                    url: 'api/v1/inventory_listing',
+                    type: 'GET',
+                    dataType: 'json',
+                    dataSrc: function (result) {
+                        return result.data;
+                    }
+                },
+                columns: [
+                    {
+                        "data": "alu", "width": "150px", className: 'text-center'
+                    },
+                    {
+                        "data": "description2", "width": "300px", className: 'text-left',
+                    },
+                    {
+                        "data": "attribute", "width": "100px", className: 'text-left',
+                    },
+                    // {
+                    //     "data": "item_size", "width": "100px", className: 'text-left',
+                    // },
+                    {
+                        "data": "onHand", "width": "120px", className: 'text-center'
+                    },
+                    {
+                        "data": "committed", "width": "120px", className: 'text-center'
+                    },
+                    {
+                        "data": "available", "width": "120px", className: 'text-center'
+                    },
+                    {
+                        "data": "prices.price", "width": "120px", className: 'text-right',
+                         "render": function (data, type, row) {
+                            if (type === 'display' || type === 'filter') {
+                                return " " + parseFloat(data).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                            }
+                            return " " + data;  // For sorting and other operations
+                        }
+                    },
+                    {
+                        "data": "prices.compareAtPrice", "width": "120px", className: 'text-right',
+                        "render": function (data, type, row) {
+                            if (type === 'display' || type === 'filter') {
+                                return " " + parseFloat(data).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                            }
+                            return  " " + data;  // For sorting and other operations
+                        }
+
+                    },
+                    {
+                        "data": "store_quantities", "width": "400px", className: 'text-right', "render": function (data, type, row) {
+                            if (type === 'display' || type === 'filter') {
+
+                                var priceBlock = "";
+                                for (var i = 0; i < data.length; i++) {
+                                    priceBlock = priceBlock + "<span>" + data[i].store_name + " | &nbsp; &nbsp; &nbsp;Qty: " + data[i].qty + "</span> <br />";
+                                }
+                                return priceBlock;
+                            }
+                            return " ";
+                        }
+                    },
+                    // {
+                    //     "data": "", "width": "50px",
+                    //     className: 'text-center',
+                    //     "render": function (data, type, row) {
+                    //         if (row.error_state === true) {
+                    //             return '<img src="/Content/img/error.png" alt="Order Error" height:auto width:24px />';
+                    //         }
+                    //         else if (row.shopify_variant_id === 'NA') {
+                    //             return '<img src="/Content/img/warning.png" alt="Order Error" height:auto width:24px />';
+                    //         }
+                    //         else if (row.shopify_product_id === -1) {
+                    //             return '<img src="/Content/img/warning.png" alt="Order Error" height:auto width:24px />';
+                    //         }
+
+                    //         return "";
+
+                    //     },
+                    // },
+                    //{ "data": "service", "width": "250px" },
+                    //{ "data": "exception_source", "width": "300px" },
+                    //{ "data": "exception_message" },
+                    //{
+                    //    "data": null,
+                    //    "render": function (data, type, row) {
+                    //        return '<button class="btn btn-warning action-btn" data-id="' + row._id + '">Clear</button>';
+                    //    }, "width": "60px"
+                    //}
+                ],
+                rowGroup: {
+                    // dataSrc: 'DESCRIPTION1'
+                },
+                rowCallback: function (row, data, index) {
+
+                    //if (data.error_state === true) {
+                    //    // $(row).css('background-color', '#ff9933'); // Light red background for critical services
+                    //    $(row).css({
+                    //        'background-color': '#ff9933',
+                    //        'color': 'white'
+                    //    }); // Light red background for critical services
+                    //}
+                    //else if (data.shopify_variant_id === 'NA') {
+                    //    $(row).css('background-color', '#ffffcc'); // Light red background for critical services
+                    //}
+                    //else if (data.shopify_product_id === -1) {
+                    //    $(row).css('background-color', '#ffffcc'); // Light red background for critical services
+                    //}
+
+                },
+                deferRender: true,
+            });
+        });
+
+        // inventoryItemsGrid.ajax.reload();
+    </script>
+
+}

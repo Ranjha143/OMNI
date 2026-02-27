@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35931.197
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OMNI", "OMNI\OMNI.csproj", "{BCB528B1-C502-4AEE-BC27-426CB32EC120}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Omni_Courier_Service", "Courier_Service\Omni_Courier_Service.csproj", "{26CF15A6-4108-7583-FE5E-C21D9F5D22EE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BCB528B1-C502-4AEE-BC27-426CB32EC120}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCB528B1-C502-4AEE-BC27-426CB32EC120}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCB528B1-C502-4AEE-BC27-426CB32EC120}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCB528B1-C502-4AEE-BC27-426CB32EC120}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26CF15A6-4108-7583-FE5E-C21D9F5D22EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26CF15A6-4108-7583-FE5E-C21D9F5D22EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26CF15A6-4108-7583-FE5E-C21D9F5D22EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26CF15A6-4108-7583-FE5E-C21D9F5D22EE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {52C67872-FB39-4853-9927-53C12CC443BB}
+	EndGlobalSection
+EndGlobal

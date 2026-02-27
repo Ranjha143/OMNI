@@ -1,0 +1,698 @@
+﻿@page
+@model OMNI.Pages.usersModel
+@{
+    ViewBag.Title = "UserInfo Listing";
+}
+
+<style>
+    th {
+        text-align: center !important;
+    }
+
+    table.dataTable tbody td img {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: auto !important; /* Adjust width as needed */
+        height: auto !important; /* Adjust height as needed */
+    }
+
+    div.dataTables_wrapper div.dataTables_length select {
+        width: 90px !important;
+        display: inline-block;
+    }
+</style>
+
+<section class="section">
+    <div class="section-header">
+        <h1>User Management</h1>
+        <div class="section-header-dates">
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header pt-2 pb-2">
+                    <h4>Users</h4>
+                    <div class="card-header-action">
+                        <button class="btn btn-primary text-center" onclick="AddNewUser()">
+                            Add New
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body pt-1" style="min-height:calc(70vh - 20px)">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover" id="userListGrid" style="width:100%; font-size:14px!important">
+                            <thead>
+                                <tr>
+                                    <th style="text-align: left !important">Full Name</th>
+                                    <th style="text-align: left !important ">Email</th>
+                                    <th style="text-align: left !important ">User Name</th>
+                                    <th style="text-align: left !important">Login type</th>
+                                    <th style="text-align: left !important">Assigned Store</th>
+                                    <th></th>
+                                    @*   <th></th>*@
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<div class="modal fade " id="userDetailDialog" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="dialogHeaderText">User</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <div class="p-3 pt-1">
+
+                    <form class="needs-validation" novalidate="" id="createUserForm" method="post">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label asp-for="User.UserType">User Type</label>
+                                    <select class="form-control" asp-for="User.UserType" id="usertype" required="">
+                                        <option value="">Select User Type</option>
+                                        <option value="Admin">Admin</option>
+                                        <option value="Staff">Staff</option>
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        User type is required
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label asp-for="User.FullName">Full Name</label>
+                                    <input type="text" class="form-control w-100" asp-for="User.FullName" id="fullname" required="">
+                                    <div class="invalid-feedback">
+                                        User full name is required
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label asp-for="User.Email">Email</label>
+                                    <input type="email" class="form-control w-100" asp-for="User.Email" id="useremail" required="">
+                                    <div class="invalid-feedback">
+                                        User email is required
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label asp-for="User.StoreId">Select Store</label>
+                                    <select asp-for="User.StoreId" id="storeSelect" class="form-control" required="">
+                                        <option value="-1">Select Store</option>
+                                        @foreach (var store in Model.Stores)
+                                        {
+                                            <option value="@store.sid">@store.store_name</option>
+                                        }
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Please select a valid store
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label asp-for="User.LoginId">Login ID</label>
+                                    <input type="text" class="form-control w-100" asp-for="User.LoginId" id="loginid" required="">
+                                    <div class="invalid-feedback">
+                                        Login ID is required
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label asp-for="User.Password">Password</label>
+                                    <input type="password" class="form-control w-100" asp-for="User.Password" id="password" required="">
+                                    <div class="invalid-feedback">
+                                        Password is required
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label asp-for="User.ConfirmPassword">Confirm Password</label>
+                                    <input type="password" class="form-control w-100" asp-for="User.ConfirmPassword" id="confirmPassword" required="">
+                                    <div class="invalid-feedback">
+                                        Passwords do not match!
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" type="submit">Submit</button>
+                    </form>
+                
+                </div>
+
+            </div>
+            <div class="modal-footer bg-whitesmoke br">
+                <button type="button" class="btn btn-sm btn-warning" data-dismiss="modal" style="width:150px;">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade " id="passwordChange" tabindex="-1" role="dialog" aria-labelledby="passwordChange"
+     aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="">Chnage User Password</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <div class="p-3 pt-1">
+
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label asp-for="User.UserType">User Name</label>
+                                    <input type="text" class="form-control w-100" id="fullname_changePass" readonly />
+                                    <input type="hidden" id="user_id" readonly />
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label asp-for="User.Password">Password</label>
+                                <input type="password" class="form-control w-100" id="password_changePass" required="">
+                                    <div class="invalid-feedback">
+                                        Password is required
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <button class="btn btn-primary w-100" onclick="changePassword()">Updare Passwords</button>
+                   
+                
+                </div>
+
+            </div>
+            <div class="modal-footer bg-whitesmoke br">
+               
+                <button type="button" class="btn btn-sm btn-warning" data-dismiss="modal" style="width:100px;">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+ @* *@
+
+ @section scripts {
+
+<script>
+
+    var UserListGrid;
+
+    $(document).ready(function () {
+    
+
+    });
+
+           
+            document.addEventListener('DOMContentLoaded', function () {
+                const form = document.getElementById('createUserForm');
+            const storeSelect = document.getElementById('storeSelect');
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirmPassword');
+                let errorMessage = "Please correct the errors in the form";
+
+
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                let isValid = true;
+                   
+                // Reset validation state
+                form.classList.remove('was-validated');
+
+                // Check storeSelect value
+                if (storeSelect.value === '-1') {
+                                
+                    storeSelect.classList.add('is-invalid');
+                        errorMessage = "Please Select Store for User"
+                    isValid = false;
+                } else {
+                    storeSelect.classList.remove('is-invalid');
+                }
+
+                // Check password confirmation
+                if (password.value !== confirmPassword.value) {
+                    confirmPassword.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    confirmPassword.classList.remove('is-invalid');
+                }
+
+                // Apply Bootstrap validation styles
+                form.classList.add('was-validated');
+                if(!form.checkValidity())
+                            {
+                                 // Show warning alert for invalid form
+                        const swalWithBootstrapButtons = Swal.mixin({
+                            customClass: {
+                                cancelButton: "btn btn-warning m-3 custom-swal-button"
+                            },
+                            buttonsStyling: false
+                        });
+
+                        swalWithBootstrapButtons.fire({
+                            title: "Form Validation Error",
+                                text: "Please fill in the marked values",
+                            icon: "warning",
+                            cancelButtonText: "OK"
+                        });
+                } else  if(!isValid) {
+                    // Show warning alert for invalid form
+                    const swalWithBootstrapButtons = Swal.mixin({
+                        customClass: {
+                            cancelButton: "btn btn-warning m-3 custom-swal-button"
+                        },
+                        buttonsStyling: false
+                    });
+
+                    swalWithBootstrapButtons.fire({
+                        title: "Form Validation Error",
+                            text: errorMessage,
+                        icon: "warning",
+                        cancelButtonText: "OK"
+                    });
+                }
+                else  if (password.value !== confirmPassword.value) {
+                        // Show warning alert for invalid form
+                        const swalWithBootstrapButtons = Swal.mixin({
+                            customClass: {
+                                cancelButton: "btn btn-warning m-3 custom-swal-button"
+                            },
+                            buttonsStyling: false
+                        });
+
+                        swalWithBootstrapButtons.fire({
+                            title: "Form Validation Error",
+                                text: "Password & Confirm Password doesnt match please verify and try again!!",
+                            icon: "warning",
+                            cancelButtonText: "OK"
+                        });
+                }
+                else
+                {
+
+
+                    let payload = {
+                            role :  document.getElementById('usertype').value,
+                            full_name :  document.getElementById('fullname').value,
+                            email :  document.getElementById('useremail').value,
+                            assigned_store :  document.getElementById('storeSelect').value,
+                            username :  document.getElementById('loginid').value,
+                            password :  document.getElementById('confirmPassword').value,
+                            auth_key :"1-2",
+                                expiry :  new Date()
+                    }
+                       
+                    $.ajax({
+                            url: 'api/v1/user',
+                        type: 'POST',
+                        contentType: 'application/json',
+                                    data:JSON.stringify({
+                                role :  document.getElementById('usertype').value,
+                                full_name :  document.getElementById('fullname').value,
+                                email :  document.getElementById('useremail').value,
+                                assigned_store :  document.getElementById('storeSelect').value,
+                                username :  document.getElementById('loginid').value,
+                                password :  document.getElementById('confirmPassword').value,
+                                auth_key :"1-2",
+                                    expiry :  new Date()
+                        }),
+                        success: function (response) {
+                            if (response.success) {
+
+                                    $('#userDetailDialog').modal('hide');
+                                         UserListGrid.ajax.reload();
+                            } else {
+                              
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            alert("An error occurred: " + error);
+                        }
+                    });
+
+                }
+
+            });
+
+            // Real-time validation for storeSelect
+            storeSelect.addEventListener('change', function () {
+                if (storeSelect.value === '-1') {
+                    storeSelect.classList.add('is-invalid');
+                } else {
+                    storeSelect.classList.remove('is-invalid');
+                }
+            });
+
+            // Real-time validation for confirmPassword
+            confirmPassword.addEventListener('input', function () {
+                if (password.value !== confirmPassword.value) {
+                    confirmPassword.classList.add('is-invalid');
+                } else {
+                    confirmPassword.classList.remove('is-invalid');
+                }
+            });
+        });
+
+
+    function clearForm() {
+
+        document.getElementById('usertype').value ="";
+        document.getElementById('usertype').dispatchEvent(new Event('change'));
+
+                  document.getElementById('storeSelect').value ="-1";
+            document.getElementById('storeSelect').dispatchEvent(new Event('change'));
+
+        document.getElementById('usertype').disabled = false;
+        document.getElementById('fullname').value = "";
+        document.getElementById('fullname').disabled = false;
+        document.getElementById('useremail').value = "";
+        document.getElementById('useremail').disabled = false;
+        document.getElementById('loginid').value = "";
+        document.getElementById('loginid').disabled = false;
+
+        document.getElementById('confirmPassword').value = "";
+        document.getElementById('confirmPassword').disabled = false;
+
+        document.getElementById('password').value = "";
+        document.getElementById('password').disabled = false;
+    }
+
+    let editMode = false;
+
+
+    // document.querySelector('form').addEventListener('submit', function (event) {
+    //     var password = document.getElementById('password').value;
+    //     var confirmPassword = document.getElementById('confirmPassword').value;
+    //     event.preventDefault();
+
+    //     if (password && confirmPassword && password === confirmPassword)
+    //     {
+
+    //         event.preventDefault();
+    //         let payLoad = {
+    //             usertype: document.getElementById('usertype').value,
+    //             fullname: document.getElementById('fullname').value,
+    //             useremail: document.getElementById('useremail').value,
+    //             loginid: document.getElementById('loginid').value,
+    //             password: document.getElementById('password').value
+    //         }
+
+    //         // Make AJAX POST request
+
+    //         if (editMode == true) {
+    //             $.ajax({
+    //                 url: '@Url.Action("UpdateUser", "Auth")',  // URL to the controller action
+    //                 type: 'PUT',
+    //                 data: payLoad,  // Data to be sent to the server
+    //                 success: function (response) {
+    //                     if (response.success) {
+
+    //                         window.location.reload();
+
+    //                     } else {
+    //                         var toastObj = document.getElementById('element').ej2_instances[0];
+    //                         toastObj.show()
+
+    //                     }
+    //                 },
+    //                 error: function (xhr, status, error) {
+    //                     alert("An error occurred: " + error);
+    //                 }
+    //             });
+    //         }
+    //         else {
+    //             $.ajax({
+    //                 url: '@Url.Action("SaveUser", "Auth")',  // URL to the controller action
+    //                 type: 'POST',
+    //                 data: payLoad,  // Data to be sent to the server
+    //                 success: function (response) {
+    //                     if (response.success) {
+
+    //                         window.location.reload();
+
+    //                     } else {
+    //                         var toastObj = document.getElementById('element').ej2_instances[0];
+    //                         toastObj.show()
+
+    //                     }
+    //                 },
+    //                 error: function (xhr, status, error) {
+    //                     alert("An error occurred: " + error);
+    //                 }
+    //             });
+    //         }
+
+
+    //     }
+    //     else {
+    //         event.preventDefault();
+    //         var toastObj = document.getElementById('element').ej2_instances[0];
+    //         toastObj.show()
+    //         $("#confirmPassword").addClass("is-invalid")
+    //     }
+
+    // });
+
+
+
+
+
+    function onLoad() {
+        //document.getElementById('saveUserBtn').onclick = function (e) {
+
+
+        //}
+
+    }
+
+    // function getStoreList(){
+
+    //         $.ajax({
+    //                 url:`api/v1/store/list`,
+    //             type: 'GET',
+    //             dataType: 'json',
+    //             data: { },
+    //             success: function (response) {
+                           
+
+    //             const storeSelect = document.getElementById('storeSelect');
+
+    //              while (storeSelect.firstChild) {
+    //                 storeSelect.removeChild(storeSelect.firstChild);
+    //             }
+
+    //             const seenStoreNos = new Set();
+    //                     let dOption = document.createElement('option');
+    //                     dOption.value = "-1";
+    //                         dOption.textContent = "Select Store";
+    //                     storeSelect.appendChild(dOption);
+
+    //                 response.forEach(store => {
+
+
+    //                     if (!seenStoreNos.has(store.sid)) {
+    //                         seenStoreNos.add(store.sid);
+
+    //                     const option = document.createElement('option');
+    //                         option.value = store.sid;
+    //                     option.textContent = store.store_name;
+    //                     storeSelect.appendChild(option);
+    //                 }
+    //             });
+
+    //             },
+    //             error: function (xhr, status, error) {
+                 
+    //                 console.error('Error fetching data:', error);
+    //             }
+    //         });
+
+    // }
+
+    function AddNewUser() {
+
+            clearForm();
+        document.getElementById("dialogHeaderText").innerHTML= "Add New User";
+        editMode = false;
+        $('#userDetailDialog').modal('show');
+          
+    }
+
+    function changePassword(){
+
+                            $.ajax({
+                            url: 'api/v1/user/update_pass',
+                            type: 'PUT',
+                            contentType: 'application/json',
+                                    data:JSON.stringify({
+                                    Id :  document.getElementById('user_id').value,
+                                    password :  document.getElementById('password_changePass').value,
+                            }),
+                            success: function (response) {
+                                if (response.success) {
+
+                                            $('#passwordChange').modal('hide');
+                                             UserListGrid.ajax.reload();
+                                } else {
+
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                alert("An error occurred: " + error);
+                            }
+                        });
+
+
+            }
+
+
+    $(document).ready(function () {
+
+
+        $("#security_menu").addClass("active");
+        $("#securityLink").addClass("disabled");
+        UserListGrid = $('#userListGrid').DataTable({
+            scrollX: true,
+            stateSave: true,
+            ajax: {
+                    url: '/api/V1/user/list',
+                type: 'GET',
+                dataType: 'json',
+                dataSrc: function (result) {
+                        return result;
+                }
+            },
+            columns: [
+                {
+                    "data": "full_name",
+                },
+                {
+                    "data": "email",
+                },
+                {
+                    "data": "username",
+                },
+                {
+                    "data": "role",
+                },
+                {
+                    "data": "assigned_store_name",
+                },
+                {
+                    "data": "", "width": "150px",
+                    "render": function (data, type, row) {
+
+                                    return '<button class="btn btn-warning password-btn w-100" data-id="' + row.full_name+"|"+row.Id + '">Change Password</button>';;
+
+                    },
+                    className: 'text-center'
+                },
+                //{
+                //    "data": "", "width": "150px",
+                //    "render": function (data, type, row) {
+
+                //        return '<button class="btn btn-primary edit-btn w-100" data-id="' + row._id + '">Edit</button>';;
+
+                //    },
+                //    className: 'text-center'
+                //},
+                //{
+                //    "data": "email",
+                //    "render": function (data, type, row) {
+                //        return data;
+                //    }, "width": "150px"
+                //},
+                //{
+                //    "data": "type", "width": "200px"
+                //},
+
+            ],
+            deferRender: true,
+        });
+
+
+      
+
+        $('#userListGrid tbody').on('click', '.password-btn', function () {
+            var row = $(this).data();
+
+                document.getElementById('fullname_changePass').value = row["id"].split("|")[0];
+                document.getElementById('user_id').value = row["id"].split("|")[1];
+
+                $('#passwordChange').modal('show');
+            /*
+
+            if (rowId) {
+                $.ajax({
+                    url: "/GetUser?userlogin=" + rowId["id"],
+                    type: 'GET',
+                    success: function (response) {
+                        if (response.success) {
+
+                            editMode = true;
+                  
+                           //  {"data":[{"full_name":"Super User","email":"admin@myomniconnect.live","username":"super.admin","password":"abc@123","type":"Agent","auth_key":"","IsSuccess":false,"exception_message":null,"exception":null}]}
+
+                       
+                            let userinfo = JSON.parse(response.data);
+                            document.getElementById('usertype').value = userinfo['type'].toString();
+                            document.getElementById('usertype').dispatchEvent(new Event('change'));
+                            document.getElementById('usertype').disabled = true;
+                            document.getElementById('fullname').value = userinfo.full_name;
+                            document.getElementById('fullname').disabled = true;
+                            document.getElementById('useremail').value = userinfo.email;
+                            document.getElementById('useremail').disabled = true;
+                            document.getElementById('loginid').value = userinfo.username;
+                            document.getElementById('loginid').disabled = true;
+                            var dialog = document.getElementById("dialog").ej2_instances[0];
+                            dialog.show();
+                        } else {
+                            // Show toast notification if there's an error
+                            var toastObj = document.getElementById('element').ej2_instances[0];
+                            toastObj.show();
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        alert("An error occurred: " + error);
+                    }
+                });
+            } else {
+                alert("No user ID found!");  // Error handling if rowId is not found
+            }
+
+            */
+        });
+
+    });
+
+</script>
+
+    }

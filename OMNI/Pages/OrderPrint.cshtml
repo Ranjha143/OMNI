@@ -1,0 +1,415 @@
+﻿@page
+@model OMNI.Pages.OrderPrintModel
+@{
+    Layout = null;
+}
+
+
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css"
+		  rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl"
+		  crossorigin="anonymous" />
+	<style>tbody, td, tfoot, th, thead, tr { border-width: 0 !important; }</style>
+    <script src="~/assets/jsbarcode/jsbarcode.all.min.js" charset="UTF-8"></script>
+</head>
+<body style="font-size: 13px;">
+
+    @if (Model.order.Courier.CnNumber != "")
+    {
+    
+        <div style="width: 870px" class="ml-2 p-4 pt-0">
+            <div class="row">
+                <div class="col-4 p-1 text-center">
+                    <div style="height: 70px; margin-top: 15px; margin-bottom:0;">
+                        <svg id='barcode_@Model.order.Name'></svg>
+                        <script>JsBarcode("#barcode_"+'@Model.order.Name'+"" , '@Model.order.Name'+"" , { format: 'CODE128', height: 55, width: 1.7, marginLeft: 30, marginRight: 30, displayValue: false });</script>
+                    </div>
+                    @Model.order.Name
+                </div>
+                <div class="col-4 p-1" style="font-size: 36px; text-align: center; padding-top:20px !important;">
+                    <div style="height: 60px; overflow: hidden;">
+                        <img src="~/assets/content/img/logo.png" />
+                    </div>
+                </div>
+                <div class="col-4 p-1 text-center">
+                    <div style="height: 70px; margin-top: 15px; margin-bottom:0;">
+                        <svg id='barcode_@Model.order.Courier.CnNumber'></svg>
+                        <script>
+                            JsBarcode("#barcode_"+@Model.order.Courier.CnNumber+"" , @Model.order.Courier.CnNumber+"" , {format: "CODE128",height: 55,width: 1.7,marginLeft: 30,marginRight: 30,displayValue: false})
+                        </script>
+                    </div>
+                    @Model.order.Courier.CnNumber
+                </div>
+            </div>
+            <hr style="border-bottom: 1px double black !important;" />
+           
+            <div class="row">
+                @* <div class="col-4 row">
+                    <div class="col-12" style=" height:25px; padding: 2px 4px; border: solid 1px black; border-bottom:none; font-weight:700; ">
+                        Billing Details
+                    </div>
+                    <div class="col-12" style=" height:25px; padding: 2px 4px; border: solid 1px black; border-bottom:none;">
+                        <div class="row">
+                            <div class="col-3" style="font-weight:700">
+                                Customer
+                            </div>
+                            <div class="col-9">
+                                @Model.order.BillingAddress.Name
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12" style=" height:50px; padding: 2px 4px; border: solid 1px black; border-bottom:none;">
+                        <div class="row">
+                            @{
+                                var billAddress = Model.order.BillingAddress.Address1 + " " + Model.order.BillingAddress.Address2;
+                            }
+                            <div class="col-3" style="font-weight:700">
+                                Address
+                            </div>
+                            <div class="col-9">
+                                @billAddress
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12" style=" height:25px; padding: 2px 4px; border: solid 1px black; border-bottom:none;">
+                        <div class="row">
+                            <div class="col-3" style="font-weight:700">
+                                City
+                            </div>
+                            <div class="col-9">
+                                @Model.order.BillingAddress.City
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12" style=" height:25px; padding: 2px 4px; border: solid 1px black; border-bottom:none;">
+                        <div class="row">
+                            <div class="col-3" style="font-weight:700">
+                                Country
+                            </div>
+                            <div class="col-9">
+                                @Model.order.BillingAddress.Country
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12" style=" height:25px; padding: 2px 4px; border: solid 1px black; ">
+                        <div class="row">
+                            <div class="col-3" style="font-weight:700">
+                                Phone
+                            </div>
+                            <div class="col-9">
+                                @Model.order.BillingAddress.Phone
+                            </div>
+                        </div>
+                    </div>
+                </div> *@
+
+
+                <div class="col row">
+                    <div class="col-12" style=" height:25px; padding: 2px 4px;  border: solid 1px black; border-bottom:none; font-weight:700;">
+                       Order Details
+                    </div>
+                    <div class="col-12" style=" height:25px; padding: 2px 4px;  border: solid 1px black; border-bottom:none;">
+                        <div class="row">
+                            <div class="col-4" style="font-weight:700">
+                              Order
+                            </div>
+                            <div class="col-8">
+                                @Model.order.Name
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12" style=" height:50px; padding: 2px 4px;  border: solid 1px black; border-bottom:none;">
+                        <div class="row">
+                            <div class="col-4" style="font-weight:700">
+                                Location
+                            </div>
+                            <div class="col-8">
+                                @Model.order.assigned_store_name
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12" style=" height:25px; padding: 2px 4px;  border: solid 1px black; border-bottom:none;">
+                        <div class="row">
+                            <div class="col-4" style="font-weight:700">
+                                Item Count
+                            </div>
+                            <div class="col-8">
+                                @Model.order.LineItemList.Count()
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12" style=" height:25px; padding: 2px 4px;  border: solid 1px black; border-bottom:none; margin-left">
+                        <div class="row">
+                            <div class="col-4" style="font-weight:700">
+                                Pay Method
+                            </div>
+                            <div class="col-8">
+                                @Model.order.PaymentGatewayNames.FirstOrDefault()
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12" style=" height:25px; padding: 2px 4px;  border: solid 1px black;">
+                        <div class="row">
+                            <div class="col-4" style="font-weight:700">
+                                Paid Amount
+                            </div>
+                            <div class="col-8">
+                                @Model.order.TotalReceivedSet.ShopMoney.Amount  @Model.order.TotalReceivedSet.ShopMoney.CurrencyCode
+                            </div>
+                        </div>
+                    </div>
+                    @* <div class="col-12" style=" height:25px; padding: 2px 4px;  border: solid 1px black;">
+                        <div class="row">
+                            <div class="col-4" style="font-weight:700">
+                               &nbsp;
+                            </div>
+                            <div class="col-8">
+                                &nbsp;
+                            </div>
+                        </div>
+                    </div> *@
+                </div>
+
+
+
+                <div class="col row">
+                    <div class="col-12" style=" height:25px; padding: 2px 4px;  border: solid 1px black; border-bottom:none; font-weight:700;">
+                        Shipping Details
+                    </div>
+                    <div class="col-12" style=" height:25px; padding: 2px 4px;  border: solid 1px black; border-bottom:none;">
+                        <div class="row">
+                            <div class="col-3" style="font-weight:700">
+                                Customer
+                            </div>
+                            <div class="col-9">
+                                @Model.order.ShippingAddress.Name
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12" style=" height:50px; padding: 2px 4px;  border: solid 1px black; border-bottom:none;">
+
+                        <div class="row">
+                            @{
+                                var shipAddress = Model.order.ShippingAddress.Address1 + " " + Model.order.ShippingAddress.Address2;
+                            }
+                            <div class="col-3" style="font-weight:700">
+                                Address
+                            </div>
+                            <div class="col-9">
+                                @shipAddress
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12" style=" height:25px; padding: 2px 4px;  border: solid 1px black; border-bottom:none;">
+                        <div class="row">
+                            <div class="col-3" style="font-weight:700">
+                                City
+                            </div>
+                            <div class="col-9">
+                                @Model.order.ShippingAddress.City
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12" style=" height:25px; padding: 2px 4px;  border: solid 1px black; border-bottom:none;">
+                        <div class="row">
+                            <div class="col-3" style="font-weight:700">
+                                Country
+                            </div>
+                            <div class="col-9">
+                                @Model.order.ShippingAddress.Country
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12" style=" height:25px; padding: 2px 4px;  border: solid 1px black;">
+                        <div class="row">
+                            <div class="col-3" style="font-weight:700">
+                                Phone
+                            </div>
+                            <div class="col-9">
+                                @Model.order.ShippingAddress.Phone
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="row" style="margin-top:10px">
+                <div class="col-12" style=" padding: 2px 4px;  border: solid 1px black; border-bottom:none; font-weight:700;">
+                    Courier Details
+                </div>
+                <div class="col-3" style=" padding: 0 4px;  border: solid 1px black; display:flex; align-items: center;">
+                    <b>Courier :</b> &nbsp;   @Model.order.Courier.CourierName
+                </div>
+                <div class="col-3" style=" padding: 0 4px;  border: solid 1px black; display:flex; align-items: center;">
+                    <b>Shipping Charges :</b> &nbsp;   @Model.order.TotalShippingPriceSet.ShopMoney.Amount @Model.order.TotalShippingPriceSet.ShopMoney.CurrencyCode
+                </div>
+                <div class="col-3" style=" padding: 2px 4px;  border: solid 1px black; display:flex; align-items: center;">
+
+                    @{
+                        var anount = @Model.order.PaymentGatewayNames.FirstOrDefault() == "Cash on Delivery (COD)" ? @Model.order.TotalOutstandingSet.ShopMoney.Amount : 0;
+                    }
+
+                    <b> Collection Amount : </b> &nbsp; @anount  @Model.order.TotalOutstandingSet.ShopMoney.CurrencyCode
+                </div>
+                <div class="col-3 text-center" style=" padding: 2px 4px;  border: solid 1px black;">
+                    <svg id="barcode_@Model.order.OrderId"></svg>
+                    <script>
+                        JsBarcode('#barcode_'+ @Model.order.OrderId + "", @Model.order.TotalPriceSet.ShopMoney.Amount + "", {format: 'CODE128',height: 30,width: 1.7,marginLeft: 0,marginRight: 0,displayValue: false});
+                    </script>
+                    <br />
+                    @anount  @Model.order.TotalOutstandingSet.ShopMoney.CurrencyCode
+                </div>
+            </div>
+
+            <div class="row" style="margin-top:10px">
+                <div class="col-12" style="overflow:hidden">
+                    <img src="~/assets/content/img/scissorswithcutlines.png" height="13px" />
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-4 p-1 text-center">
+                    <div style="height: 70px; margin-top: 15px; margin-bottom:0;">
+                        <svg id='barcode_@Model.order.Name'></svg>
+                        <script>JsBarcode("#barcode_"+'@Model.order.Name'+"" , '@Model.order.Name'+"" , { format: 'CODE128', height: 55, width: 1.7, marginLeft: 30, marginRight: 30, displayValue: false });</script>
+                    </div>
+                    @Model.order.Name
+                </div>
+                <div class="col-4 p-1" style="font-size: 36px; text-align: center; padding-top:20px !important;">
+                    <div style="height: 60px; overflow: hidden;">
+                        <img src="~/assets/content/img/logo.png" />
+                    </div>
+                </div>
+                <div class="col-4 p-1 text-center">
+                    <div style="height: 70px; margin-top: 15px; margin-bottom:0;">
+                        <svg id='barcode_@Model.order.Courier.CnNumber'></svg>
+                        <script>
+                            JsBarcode("#barcode_"+@Model.order.Courier.CnNumber+"" , @Model.order.Courier.CnNumber+"" , {format: "CODE128",height: 55,width: 1.7,marginLeft: 30,marginRight: 30,displayValue: false})
+                        </script>
+                    </div>
+                    @Model.order.Courier.CnNumber
+                </div>
+            </div>
+
+
+           
+        <div class="row mt-2">
+                <div class="col-12 p-0 ">
+                    <h5>Product Detail</h5>
+                    <table class="table">
+                        <thead class="border-bottom border-1 border-dark">
+                            <tr>
+                                <th scope="col" class="text-center align-middle" style="width: 15% !important">Product</th>
+                                <th scope="col" class="text-center align-middle" style="width: 15% !important">SKU</th>
+                                <th scope="col" class="text-center align-middle" style="width: 10% !important">Price</th>
+                                <th scope="col" class="text-center align-middle" style="width: 10% !important">Item Discount</th>
+                                <th scope="col" class="text-center align-middle" style="width: 10% !important">Total Price</th>
+                                <th scope="col" class="text-center align-middle" style="width: 10% !important">Qty</th>
+                                <th scope="col" class="text-center align-middle" style="width: 10% !important">Total Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.order.LineItemList)
+                            {
+                                <tr class=" mb-2 border-bottom border-1 border-dark">
+                                    <td class="text-center align-middle" style="width: 30% !important">
+                                        @item.Name
+                                    </td>
+                                    <td class="text-center align-middle" style="width: 15% !important">
+                                        @item.Sku
+                                    </td>
+                                    <td class="text-center align-middle" style="width: 10% !important">
+                                        @item.OriginalUnitPriceSet.ShopMoney.Amount
+                                    </td>
+                                    <td class="text-center align-middle" style="width: 10% !important">
+                                        @item.TotalDiscountSet.ShopMoney.Amount
+                                    </td>
+                                    <td class="text-center align-middle" style="width: 10% !important">
+                                        @(item.OriginalUnitPriceSet.ShopMoney.Amount - item.TotalDiscountSet.ShopMoney.Amount)
+                                    </td>
+                                    <td class="text-center align-middle" style="width: 10% !important">
+                                        @item.Quantity
+                                    </td>
+                                    <td class="text-center align-middle" style="width: 10% !important">
+                                        @((item.OriginalUnitPriceSet.ShopMoney.Amount - item.TotalDiscountSet.ShopMoney.Amount) * item.Quantity)
+                                    </td>
+                                </tr>
+                            }
+                            <tr class="border-top border-1 border-dark border-0">
+                                <td colspan="5" class="text-end align-middle" style="width: 10% !important"> Total Qty:</td>
+                                <td class="text-center align-middle" style="width: 10% !important"> @(Model.order.LineItemList.Sum(i => i.Quantity))</td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+        </div>
+
+            <div class="row mt-0">
+                <div class="col-12 p-0 ">
+                    <h5>Payment Detail</h5>
+                    <table class="table">
+                        <thead class="border-bottom border-1 border-dark">
+                            <tr>
+                                <th scope="col" class="align-middle" style="width: 25% !important">Total price</th>
+                                <th scope="col" class="align-middle" style="width: 25% !important">Shipping</th>
+                                <th scope="col" class="align-middle" style="width: 25% !important">Paid Amount</th>
+                                <th scope="col" class="align-middle" style="width: 25% !important">Total Payable</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-top border-1 border-dark">
+                                <td class="align-middle"> @Model.order.LineItemList.Sum(i=>i.DiscountedUnitPriceAfterAllDiscountsSet.ShopMoney.Amount)</td>
+                                <td class="align-middle"> @Model.order.TotalShippingPriceSet.ShopMoney.Amount</td>
+                                <td class="align-middle"> @Model.order.TotalReceivedSet.ShopMoney.Amount</td>
+                                <td class="align-middle"> @Model.order.TotalOutstandingSet.ShopMoney.Amount</td>
+                        
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+        </div>
+            <div class="row mt-2">
+                <div class="col-2"><b>Pick Location:</b></div>
+                <div class="col-10">@Model.order.assigned_store_name</div>
+            </div>
+            <div class="row mt-0">
+                <div class="col-2"><b>Call & WhatsApp:</b></div>
+                <div class="col-10">+971528442712</div>
+            </div>
+            <div class="row mt-0">
+                <div class="col-2"><b>Email:</b></div>
+                <div class="col-10">customercare@logoofficial.ae</div>
+            </div>    @* *@
+
+
+        </div>
+        <p style="page-break-before:auto; page-break-after:avoid;" />
+
+        <script>
+            window.onload = function () {
+                window.print();
+            };
+        </script>
+    }
+    else
+    {
+        <div style="width: 870px" class="ml-2 p-4">
+            <div class="row">
+                <div class="col-12 p-1 text-center">
+                   <h3>
+                       Courier Tracking Number not assigned! <br/>
+                       Kindly contact Omni Admin.
+                   </h3>
+                </div>
+            </div>
+        </div>
+    }
+
+
+</body>
+</html>
