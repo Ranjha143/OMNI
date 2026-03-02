@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.AspNetCore.SignalR.Protocol;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -59,7 +60,7 @@ namespace RetailPro2_X
             //var workerTask = Task.Factory.StartNew(() => LoadConfigurations().Wait());
             //Task.WaitAll(workerTask);
             GlobalVariables.RetailProOrderWorker = true;
-            //await LoadConfigurations();
+            await LoadConfigurations();
             await ProcessOrders();
             GlobalVariables.RetailProOrderWorker = false;
             //threadWorker.RunWorkerAsync();
@@ -3611,13 +3612,17 @@ tax_amount: 115.83333
         public object Destsublocid { get; set; }
     }
 
-
+    [BsonIgnoreExtraElements]
     public class PaymentGatewayInfo
     {
+        [BsonElement("payment_gateway_name")]
         [JsonProperty("payment_gateway_name")]
+        
         public string PaymentGatewayName { get; set; } = string.Empty;
 
+        [BsonElement("payment_gateway_account_id")]
         [JsonProperty("payment_gateway_account_id")]
+       
         public string PaymentGatewayAccountId { get; set; } = string.Empty;
     }
     

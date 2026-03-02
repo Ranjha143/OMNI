@@ -20,7 +20,7 @@ namespace RetailPro2_X
 
 #if DEBUG
             //FetchInventoryService();
-            //PostSaleOrder();
+            PostSaleOrder();
 #endif
 #if !DEBUG
 
