@@ -540,7 +540,7 @@ namespace OMNI_Dashboard.ApiControllers
                     }
                     else if (orderType == "AssignedOrders")
                     {
-                        filter = @$"{{createdAt: {{ $gte:'{fromDate}',  $lte:'{toDate}'}}, has_error: false, accepted_by_store:'pending', posted:false, status:{{$ne:""Cancelled""}} }}";
+                        filter = @$"{{createdAt: {{ $gte:'{fromDate}',  $lte:'{toDate}'}}, has_error: false, accepted_by_store:'pending', posted:false, status:{{$ne:'Cancelled'}} }}";
                     }
                     else if (orderType == "AcceptedOrders")
                     {
