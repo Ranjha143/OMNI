@@ -7,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 var env = builder.Environment;
 
+
 // Configure Services
 builder.Services.AddControllers();
 builder.Services.AddRazorPages();
