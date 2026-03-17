@@ -69,11 +69,11 @@ namespace Shopify
 
 #if DEBUG
 
-            //var workerTask = Task.Factory.StartNew(() => ProcessOrders().Wait());
-            //workerTask.Wait();
+            var workerTask = Task.Factory.StartNew(() => ProcessOrders().Wait());
+            workerTask.Wait();
 
-            //var eventWorkerTask = Task.Factory.StartNew(() => GetOrderEvents().Wait());
-            //eventWorkerTask.Wait();
+            var eventWorkerTask = Task.Factory.StartNew(() => GetOrderEvents().Wait());
+            eventWorkerTask.Wait();
 
 #endif
 
@@ -227,7 +227,8 @@ namespace Shopify
                         
                        if (service.ToUpper() == "ORDERS")
                         {
-                            QueryParam = @$"first: {orderCount}, query: ""financial_status:'pending' AND fulfillment_status:'unfulfilled' AND updated_at:>'{createdAt}'""{(string.IsNullOrEmpty(endCursor) ? "" : $", after:\"{endCursor}\"")}";
+                            // QueryParam = @$"first: {orderCount}, query: ""financial_status:'pending' AND fulfillment_status:'unfulfilled' AND updated_at:>'{createdAt}'""{(string.IsNullOrEmpty(endCursor) ? "" : $", after:\"{endCursor}\"")}";
+                            QueryParam = @$"first: {orderCount}, query: ""financial_status:pending AND fulfillment_status:unfulfilled AND updated_at:>'{createdAt}'""{(string.IsNullOrEmpty(endCursor) ? "" : $", after:\"{endCursor}\"")}";
                         }
                         else if (service.ToUpper() == "INVOICES")
                         {
@@ -248,7 +249,7 @@ namespace Shopify
                         }
                         else if (service.ToUpper() == "CANCELLED")
                         {
-                            QueryParam = @$"first: {orderCount}, query: ""status:'cancelled' AND updated_at:>'{createdAt}'""{(string.IsNullOrEmpty(endCursor) ? "" : $", after:\"{endCursor}\"")}";
+                            QueryParam = @$"first: {orderCount}, query: ""status:'cancrelled' AND updated_at:>'{createdAt}'""{(string.IsNullOrEmpty(endCursor) ? "" : $", after:\"{endCursor}\"")}";
                         }
 
                         var orderGQ = GraphQuery.Order(QueryParam);
@@ -296,7 +297,10 @@ namespace Shopify
 
                                     if (existingDocument == null)
                                     {
-
+                                        if (order.PaymentGatewayNames == null || order.PaymentGatewayNames.Count == 0)
+                                        {
+                                            order.PaymentGatewayNames = new List<string>() { "Cash on Delivery (COD)" };
+                                        }
                                         if (service.ToUpper() == "REFUNDED" || service.ToUpper() == "PARTIALLY_REFUNDED" || service.ToUpper() == "RETURNED" || service.ToUpper() == "PARTIALLY_REFUNDED")
                                         {
                                             if (originalSaleOrder != null && originalSaleOrder.posted)

@@ -30,18 +30,18 @@ namespace Shopify
 
 #if DEBUG
 
-             //GetShopifyInventory();
+            GetShopifyInventory();
 
-            //GetShopifyOrder();
+            GetShopifyOrder();
 
-            // if (GlobalVariables.ShopifyConfig.SaleFulfillmentDirection == "push")
-            //     SendShopifyFulfilment();
+            //if (GlobalVariables.ShopifyConfig.SaleFulfillmentDirection == "push")
+            //    SendShopifyFulfilment();
 
-            // if (GlobalVariables.ShopifyConfig.SaleCancellationDirection == "push")
-            //     SendShopifyCancellation();
+            //if (GlobalVariables.ShopifyConfig.SaleCancellationDirection == "push")
+            //    SendShopifyCancellation();
 
-            // if (GlobalVariables.ShopifyConfig.SaleFulfillmentDirection == "push")
-            //     SendShopifyFulfilment();
+            //if (GlobalVariables.ShopifyConfig.SaleFulfillmentDirection == "push")
+            //    SendShopifyFulfilment();
 
 #endif
 

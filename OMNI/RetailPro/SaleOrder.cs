@@ -113,8 +113,8 @@ namespace RetailPro2_X
                 var retailproConfig = GlobalVariables.RProConfig;
 
 #if DEBUG
-                var refundWorkerTask = Task.Factory.StartNew(() => PosRefundInvoice().Wait());
-                Task.WaitAll(refundWorkerTask);
+                //var refundWorkerTask = Task.Factory.StartNew(() => PosRefundInvoice().Wait());
+                //Task.WaitAll(refundWorkerTask);
                 var soWorkerTask = Task.Factory.StartNew(() => PostDirectSaleInvoice().Wait());
                 Task.WaitAll(soWorkerTask);
 #endif
@@ -1072,6 +1072,7 @@ namespace RetailPro2_X
                                 continue;
                             }
                         }
+                      
                         else
                         {
 
