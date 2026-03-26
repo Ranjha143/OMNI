@@ -113,8 +113,8 @@ namespace RetailPro2_X
                 var retailproConfig = GlobalVariables.RProConfig;
 
 #if DEBUG
-                //var refundWorkerTask = Task.Factory.StartNew(() => PosRefundInvoice().Wait());
-                //Task.WaitAll(refundWorkerTask);
+                var refundWorkerTask = Task.Factory.StartNew(() => PosRefundInvoice().Wait());
+                Task.WaitAll(refundWorkerTask);
                 var soWorkerTask = Task.Factory.StartNew(() => PostDirectSaleInvoice().Wait());
                 Task.WaitAll(soWorkerTask);
 #endif
@@ -1274,34 +1274,99 @@ namespace RetailPro2_X
 
                                     //long.TryParse(retailProInvoiceSid, out long saleRefSid);
 
+                                    //foreach (var item in lineItems)
+                                    //{
+                                    //    var itemQry = $@"
+                                    //           SELECT * from (
+                                    //                select TO_CHAR(I.SID) AS SID, I.ALU as ALU,I.ALU as SKU, I.UPC as UPC, NVL(IQ.QTY,0) AS STORE_OH,
+                                    //                NVL(P1.PRICE,0) AS PRICE, s.PRICE_LVL FROM RPS.INVN_SBS_ITEM I
+                                    //                INNER JOIN RPS.SUBSIDIARY SS ON I.SBS_SID = SS.SID
+                                    //                CROSS JOIN RPS.PRICE_LEVEL S
+                                    //                LEFT JOIN RPS.INVN_SBS_PRICE P1 ON I.SID = P1.INVN_SBS_ITEM_SID AND I.SBS_SID = P1.SBS_SID AND S.SID = P1.PRICE_LVL_SID
+                                    //                LEFT JOIN RPS.INVN_SBS_ITEM_QTY IQ ON I.SID = IQ.INVN_SBS_ITEM_SID AND I.SBS_SID = IQ.SBS_SID AND (IQ.SBS_SID,IQ.STORE_SID) IN (
+                                    //                    SELECT SBS_SID,SID FROM RPS.STORE WHERE STORE_NO = {GlobalVariables.RProConfig.OrderStoreNo} AND sbs_sid = (select sid from RPS.SUBSIDIARY where sbs_no = {GlobalVariables.RProConfig.SBS_NO}) )
+                                    //                WHERE 1=1
+                                    //                AND I.SBS_SID = S.SBS_SID
+                                    //                AND SS.SBS_NO = {GlobalVariables.RProConfig.SBS_NO}
+                                    //                AND I.Active = 1
+                                    //                AND NVL(I.ORDERABLE, 0) = 1
+                                    //            ) pivot (
+                                    //                sum(PRICE) for PRICE_LVL in (3 AS Price_Lvl_3,4 AS Price_Lvl_4,5 AS Price_Lvl_5,6 AS Price_Lvl_6,7 AS Price_Lvl_7)
+                                    //            )t
+                                    //            where t.ALU ='{item.LineItem.Sku}'
+                                    //    ";
+
+                                    //    var itemsResult = ADO.ReadAsync<InventoryModel>(itemQry)?.FirstOrDefault() ?? new(); //connection.Query<InventoryModel>(itemQry).FirstOrDefault();
+
+                                    //    var docItemrefSidQuery = $@"select to_char(sid) as SID from Rps.Document_item where DOC_SID = '{retailProInvoiceSid}' and INVN_SBS_ITEM_SID = '{itemsResult.SID}'";
+                                    //    JObject docRefResponse = RetailPro2_X.BL.ADO.ReadAsync<JObject>(docItemrefSidQuery)?.FirstOrDefault() ?? new();
+                                    //    var docItemrefSid = docRefResponse["SID"]?.ToString() ?? "NA";
+
+                                    //    var itemInfo = new ItemPostInfo
+                                    //    {
+                                    //        origin_application = "OMNI",
+                                    //        invn_sbs_item_sid = itemsResult.SID,
+                                    //        item_type = 2,
+                                    //        quantity = item.Quantity,
+                                    //        qty_available_for_return = item.Quantity,
+                                    //        fulfill_store_sid = storeInfo.SID,
+                                    //        return_reason = "Unwanted Item",
+                                    //        price_lvl = 2,
+                                    //        manual_disc_type = 0,
+                                    //        manual_disc_value = item.SubtotalSet.ShopMoney.Amount,
+                                    //        manual_disc_reason = "GOODWILL",
+                                    //        returned_item_invoice_sid = docItemrefSid
+                                    //    };
+
+                                    //    if (item.LineItem.OriginalTotalSet.ShopMoney.Amount > item.LineItem.DiscountedTotalSet.ShopMoney.Amount)
+                                    //    {
+                                    //        itemInfo.manual_disc_type = 0;
+                                    //        itemInfo.manual_disc_value = item.LineItem.DiscountedTotalSet.ShopMoney.Amount;
+                                    //        itemInfo.manual_disc_reason = "GOODWILL";
+                                    //    }
+
+                                    //    ItemPostInfo.Add(itemInfo);
+                                    //    itemPos++;
+                                    //}
+                                    var docitemsid = "";
                                     foreach (var item in lineItems)
                                     {
                                         var itemQry = $@"
-                                               SELECT * from (
-                                                    select TO_CHAR(I.SID) AS SID, I.ALU as ALU,I.ALU as SKU, I.UPC as UPC, NVL(IQ.QTY,0) AS STORE_OH,
-                                                    NVL(P1.PRICE,0) AS PRICE, s.PRICE_LVL FROM RPS.INVN_SBS_ITEM I
-                                                    INNER JOIN RPS.SUBSIDIARY SS ON I.SBS_SID = SS.SID
-                                                    CROSS JOIN RPS.PRICE_LEVEL S
-                                                    LEFT JOIN RPS.INVN_SBS_PRICE P1 ON I.SID = P1.INVN_SBS_ITEM_SID AND I.SBS_SID = P1.SBS_SID AND S.SID = P1.PRICE_LVL_SID
-                                                    LEFT JOIN RPS.INVN_SBS_ITEM_QTY IQ ON I.SID = IQ.INVN_SBS_ITEM_SID AND I.SBS_SID = IQ.SBS_SID AND (IQ.SBS_SID,IQ.STORE_SID) IN (
-                                                        SELECT SBS_SID,SID FROM RPS.STORE WHERE STORE_NO = {GlobalVariables.RProConfig.OrderStoreNo} AND sbs_sid = (select sid from RPS.SUBSIDIARY where sbs_no = {GlobalVariables.RProConfig.SBS_NO}) )
-                                                    WHERE 1=1
-                                                    AND I.SBS_SID = S.SBS_SID
-                                                    AND SS.SBS_NO = {GlobalVariables.RProConfig.SBS_NO}
-                                                    AND I.Active = 1
-                                                    AND NVL(I.ORDERABLE, 0) = 1
-                                                ) pivot (
-                                                    sum(PRICE) for PRICE_LVL in (3 AS Price_Lvl_3,4 AS Price_Lvl_4,5 AS Price_Lvl_5,6 AS Price_Lvl_6,7 AS Price_Lvl_7)
-                                                )t
-                                                where t.ALU ='{item.LineItem.Sku}'
-                                        ";
+                     SELECT * from (
+                          select TO_CHAR(I.SID) AS SID, I.ALU as ALU,I.ALU as SKU, I.UPC as UPC, NVL(IQ.QTY,0) AS STORE_OH,
+                          NVL(P1.PRICE,0) AS PRICE, s.PRICE_LVL FROM RPS.INVN_SBS_ITEM I
+                          INNER JOIN RPS.SUBSIDIARY SS ON I.SBS_SID = SS.SID
+                          CROSS JOIN RPS.PRICE_LEVEL S
+                          LEFT JOIN RPS.INVN_SBS_PRICE P1 ON I.SID = P1.INVN_SBS_ITEM_SID AND I.SBS_SID = P1.SBS_SID AND S.SID = P1.PRICE_LVL_SID
+                          LEFT JOIN RPS.INVN_SBS_ITEM_QTY IQ ON I.SID = IQ.INVN_SBS_ITEM_SID AND I.SBS_SID = IQ.SBS_SID AND (IQ.SBS_SID,IQ.STORE_SID) IN (
+                              SELECT SBS_SID,SID FROM RPS.STORE WHERE STORE_NO = {GlobalVariables.RProConfig.OrderStoreNo} AND sbs_sid = (select sid from RPS.SUBSIDIARY where sbs_no = {GlobalVariables.RProConfig.SBS_NO}) )
+                          WHERE 1=1
+                          AND I.SBS_SID = S.SBS_SID
+                          AND SS.SBS_NO = {GlobalVariables.RProConfig.SBS_NO}
+                          AND I.Active = 1
+                          AND NVL(I.ORDERABLE, 0) = 1
+                      ) pivot (
+                          sum(PRICE) for PRICE_LVL in (3 AS Price_Lvl_3,4 AS Price_Lvl_4,5 AS Price_Lvl_5,6 AS Price_Lvl_6,7 AS Price_Lvl_7)
+                      )t
+                      where t.ALU ='{item.LineItem.Sku}'
+              ";
 
                                         var itemsResult = ADO.ReadAsync<InventoryModel>(itemQry)?.FirstOrDefault() ?? new(); //connection.Query<InventoryModel>(itemQry).FirstOrDefault();
+                                        var docItemrefSidQuery = "";
+                                        if (String.IsNullOrEmpty(docitemsid))
+                                        {
 
-                                        var docItemrefSidQuery = $@"select to_char(sid) as SID from Rps.Document_item where DOC_SID = '{retailProInvoiceSid}' and INVN_SBS_ITEM_SID = '{itemsResult.SID}'";
+                                            docItemrefSidQuery = $@"select to_char(sid) as SID from Rps.Document_item where DOC_SID = '{retailProInvoiceSid}' and INVN_SBS_ITEM_SID = '{itemsResult.SID}'  ";
+
+                                        }
+                                        else
+                                        {
+                                            docItemrefSidQuery = $@"select to_char(sid) as SID from Rps.Document_item where DOC_SID = '{retailProInvoiceSid}' and INVN_SBS_ITEM_SID = '{itemsResult.SID}'  and sid !='{docitemsid}'";
+
+                                        }
                                         JObject docRefResponse = RetailPro2_X.BL.ADO.ReadAsync<JObject>(docItemrefSidQuery)?.FirstOrDefault() ?? new();
                                         var docItemrefSid = docRefResponse["SID"]?.ToString() ?? "NA";
-
+                                        docitemsid = docItemrefSid;
                                         var itemInfo = new ItemPostInfo
                                         {
                                             origin_application = "OMNI",
@@ -1315,6 +1380,7 @@ namespace RetailPro2_X
                                             manual_disc_type = 0,
                                             manual_disc_value = item.SubtotalSet.ShopMoney.Amount,
                                             manual_disc_reason = "GOODWILL",
+                                            //returned_item_invoice_sid = retailProInvoiceSid
                                             returned_item_invoice_sid = docItemrefSid
                                         };
 
@@ -1328,7 +1394,6 @@ namespace RetailPro2_X
                                         ItemPostInfo.Add(itemInfo);
                                         itemPos++;
                                     }
-
                                     {
                                         List<PostDocument> postDocument = new List<PostDocument>();
 
